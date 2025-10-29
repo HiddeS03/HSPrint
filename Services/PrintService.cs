@@ -99,49 +99,141 @@ if (e.Graphics != null)
 
     public async Task<bool> PrintPdf(string printerName, string base64Pdf)
     {
+     string? tempPdfPath = null;
         try
         {
-            _logger.LogInformation("Printing PDF to printer: {PrinterName}", printerName);
-            
-    // Save PDF to temp file
-   byte[] pdfBytes = Convert.FromBase64String(base64Pdf);
-            string tempPdfPath = Path.Combine(Path.GetTempPath(), $"hsprint_{Guid.NewGuid()}.pdf");
+    _logger.LogInformation("Printing PDF to printer: {PrinterName}", printerName);
+ 
+            // Save PDF to temp file
+    byte[] pdfBytes = Convert.FromBase64String(base64Pdf);
+      tempPdfPath = Path.Combine(Path.GetTempPath(), $"hsprint_{Guid.NewGuid()}.pdf");
             await File.WriteAllBytesAsync(tempPdfPath, pdfBytes);
-            
-         // Use shell command to print PDF
-     var processInfo = new System.Diagnostics.ProcessStartInfo
-            {
-   FileName = tempPdfPath,
-   Verb = "printto",
-       Arguments = $"\"{printerName}\"",
-         CreateNoWindow = true,
-     WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-      };
-            
-         var process = System.Diagnostics.Process.Start(processInfo);
-      
-       // Wait a bit and cleanup
-            await Task.Delay(5000);
-        
-     try
-   {
-    if (File.Exists(tempPdfPath))
-  {
-        File.Delete(tempPdfPath);
-    }
-    }
-   catch
+     
+            // Try using SumatraPDF for silent printing (if available)
+     var sumatraPaths = new[]
        {
-     // Ignore cleanup errors
-    }
+     @"C:\Program Files\SumatraPDF\SumatraPDF.exe",
+  @"C:\Program Files (x86)\SumatraPDF\SumatraPDF.exe",
+  Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SumatraPDF.exe")
+   };
+
+ string? sumatraPath = sumatraPaths.FirstOrDefault(File.Exists);
+
+      if (sumatraPath != null)
+            {
+            // Use SumatraPDF for reliable printing
+     var processInfo = new System.Diagnostics.ProcessStartInfo
+   {
+             FileName = sumatraPath,
+          Arguments = $"-print-to \"{printerName}\" -silent \"{tempPdfPath}\"",
+     CreateNoWindow = true,
+        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+        UseShellExecute = false
+    };
+
+var process = System.Diagnostics.Process.Start(processInfo);
+          if (process != null)
+   {
+            await process.WaitForExitAsync();
    
-          _logger.LogInformation("Successfully sent PDF to {PrinterName}", printerName);
-            return true;
-        }
-        catch (Exception ex)
+         await Task.Delay(2000); // Give time for spooler
+        
+         _logger.LogInformation("Successfully sent PDF to {PrinterName} using SumatraPDF", printerName);
+             }
+ }
+            else
+       {
+     // Fallback: Try Adobe Acrobat Reader command line
+   var adobePaths = new[]
+     {
+   @"C:\Program Files\Adobe\Acrobat DC\Acrobat\Acrobat.exe",
+          @"C:\Program Files (x86)\Adobe\Acrobat Reader DC\Reader\AcroRd32.exe",
+            @"C:\Program Files\Adobe\Acrobat Reader DC\Reader\AcroRd32.exe"
+           };
+
+    string? adobePath = adobePaths.FirstOrDefault(File.Exists);
+             
+    if (adobePath != null)
+       {
+   var processInfo = new System.Diagnostics.ProcessStartInfo
+       {
+        FileName = adobePath,
+Arguments = $"/t \"{tempPdfPath}\" \"{printerName}\"",
+       CreateNoWindow = true,
+         WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+    UseShellExecute = false
+        };
+
+  var process = System.Diagnostics.Process.Start(processInfo);
+         if (process != null)
         {
-   _logger.LogError(ex, "Error printing PDF to {PrinterName}", printerName);
+       await Task.Delay(5000); // Wait for Adobe to send to spooler
+  
+         try
+                {
+    if (!process.HasExited)
+  {
+  process.Kill(true);
+                 }
+}
+           catch
+             {
+  // Ignore errors killing Adobe Reader
+               }
+          
+          _logger.LogInformation("Successfully sent PDF to {PrinterName} using Adobe Reader", printerName);
+    }
+         }
+           else
+       {
+           // Last resort: Windows default verb (unreliable but better than nothing)
+                _logger.LogWarning("No PDF printer utility found (SumatraPDF or Adobe Reader). Using Windows shell - this may not work reliably.");
+      _logger.LogWarning("For best results, install SumatraPDF from https://www.sumatrapdfreader.org/");
+  
+    var processInfo = new System.Diagnostics.ProcessStartInfo
+     {
+   FileName = "cmd.exe",
+           Arguments = $"/c start /min \"\" \"{tempPdfPath}\"",
+             CreateNoWindow = true,
+         WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+      UseShellExecute = false
+          };
+         
+          System.Diagnostics.Process.Start(processInfo);
+    await Task.Delay(3000);
+   
+           _logger.LogWarning("Attempted to print PDF using Windows shell to {PrinterName}", printerName);
+         }
+         }
+        
+   return true;
+  }
+  catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error printing PDF to {PrinterName}", printerName);
     return false;
+        }
+        finally
+{
+// Cleanup temp file after delay
+            if (tempPdfPath != null)
+    {
+      _ = Task.Run(async () =>
+          {
+         await Task.Delay(10000); // Wait 10 seconds
+        try
+{
+     if (File.Exists(tempPdfPath))
+          {
+  File.Delete(tempPdfPath);
+       }
+        }
+                  catch
+           {
+        // Ignore cleanup errors
+ }
+        });
+            }
         }
     }
 }
