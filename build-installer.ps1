@@ -2,8 +2,8 @@
 # Builds the application and creates an MSI installer
 
 param(
-[string]$Configuration = "Release",
-[string]$Version = ""
+    [string]$Configuration = "Release",
+    [string]$Version = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,12 +14,12 @@ Write-Host ""
 
 # Get version from version.txt if not specified
 if ([string]::IsNullOrEmpty($Version)) {
- if (Test-Path "version.txt") {
+    if (Test-Path "version.txt") {
         $Version = (Get-Content "version.txt").Trim()
-  Write-Host "Using version from version.txt: $Version" -ForegroundColor Green
+        Write-Host "Using version from version.txt: $Version" -ForegroundColor Green
     } else {
-   $Version = "1.0.0"
-  Write-Host "Using default version: $Version" -ForegroundColor Yellow
+        $Version = "1.0.0"
+        Write-Host "Using default version: $Version" -ForegroundColor Yellow
     }
 }
 
@@ -32,7 +32,7 @@ Write-Host ""
 # Step 1: Clean previous builds
 Write-Host "Step 1: Cleaning previous builds..." -ForegroundColor Yellow
 if (Test-Path "artifacts") {
-    Remove-Item -Path "artifacts" -Recurse -Force
+ Remove-Item -Path "artifacts" -Recurse -Force
 }
 New-Item -ItemType Directory -Path "artifacts" -Force | Out-Null
 
@@ -55,20 +55,29 @@ if ($LASTEXITCODE -ne 0) {
 # Step 4: Publish application
 Write-Host ""
 Write-Host "Step 4: Publishing application..." -ForegroundColor Yellow
+$publishDir = "bin\$Configuration\net8.0-windows10.0.26100.0\win-x64\publish"
 dotnet publish HSPrint.csproj `
     -c $Configuration `
-    -r win-x64 `
+  -r win-x64 `
     --self-contained true `
     -p:PublishSingleFile=false `
     -p:Version=$Version `
-    -o "./artifacts/publish"
+    -o "./$publishDir"
 if ($LASTEXITCODE -ne 0) {
     throw "Failed to publish application"
 }
 
-# Step 5: Build installer (if WiX is available)
+# Step 5: Generate WiX file list
 Write-Host ""
-Write-Host "Step 5: Building MSI installer..." -ForegroundColor Yellow
+Write-Host "Step 5: Generating WiX file list..." -ForegroundColor Yellow
+& ".\HSPrint.Installer\GenerateFileList.ps1" -PublishDir $publishDir -OutputFile "HSPrint.Installer\GeneratedFiles.wxs"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "  - Warning: File list generation had issues, continuing..." -ForegroundColor Yellow
+}
+
+# Step 6: Build installer (if WiX is available)
+Write-Host ""
+Write-Host "Step 6: Building MSI installer..." -ForegroundColor Yellow
 
 # Check if WiX is installed
 $wixInstalled = $false
@@ -78,7 +87,7 @@ try {
         $wixInstalled = $true
     }
 } catch {
-    $wixInstalled = $false
+  $wixInstalled = $false
 }
 
 if ($wixInstalled) {
@@ -90,28 +99,28 @@ if ($wixInstalled) {
         -p:Version=$Version
         
     if ($LASTEXITCODE -eq 0) {
-      # Copy MSI to artifacts
+# Copy MSI to artifacts
         $msiFile = Get-ChildItem -Path "HSPrint.Installer/bin/$Configuration" -Filter "*.msi" -Recurse | Select-Object -First 1
- if ($msiFile) {
+        if ($msiFile) {
       Copy-Item $msiFile.FullName -Destination "artifacts/HSPrintSetup-$Version.msi"
-        Write-Host "  - MSI created: artifacts/HSPrintSetup-$Version.msi" -ForegroundColor Green
-        }
+            Write-Host "  - MSI created: artifacts/HSPrintSetup-$Version.msi" -ForegroundColor Green
+   }
     } else {
-        Write-Host "  - MSI build failed, continuing with ZIP package only" -ForegroundColor Yellow
+        Write-Host "  - MSI build failed, check errors above" -ForegroundColor Red
+  throw "MSI build failed"
     }
 } else {
     Write-Host "  - WiX Toolset not found, skipping MSI creation" -ForegroundColor Yellow
     Write-Host "  - Install WiX: dotnet tool install --global wix" -ForegroundColor Cyan
 }
 
-# Step 6: Create ZIP package
+# Step 7: Copy install script
 Write-Host ""
-Write-Host "Step 6: Creating ZIP package..." -ForegroundColor Yellow
-$zipPath = "artifacts/HSPrint-$Version.zip"
-Compress-Archive -Path "artifacts/publish/*" -DestinationPath $zipPath -Force
-Write-Host "  - ZIP created: $zipPath" -ForegroundColor Green
+Write-Host "Step 7: Copying install script..." -ForegroundColor Yellow
+Copy-Item "install.ps1" -Destination "artifacts/install.ps1"
+Write-Host "  - install.ps1 copied to artifacts/" -ForegroundColor Green
 
-# Step 7: Summary
+# Step 8: Summary
 Write-Host ""
 Write-Host "==============================" -ForegroundColor Green
 Write-Host "Build completed successfully!" -ForegroundColor Green
@@ -124,4 +133,4 @@ Get-ChildItem "artifacts" -File | ForEach-Object {
 }
 
 Write-Host ""
-Write-Host "To install, run: .\install.ps1" -ForegroundColor Yellow
+Write-Host "To install, run: .\install.ps1 -MsiPath '.\artifacts\HSPrintSetup-$Version.msi'" -ForegroundColor Yellow

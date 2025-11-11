@@ -16,22 +16,22 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Setup .NET
-uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v3
       with:
-dotnet-version: '8.0.x'
+        dotnet-version: '8.0.x'
 
     - name: Get version
       id: version
       shell: pwsh
       run: |
-     $version = Get-Content version.txt -Raw
- $version = $version.Trim()
-        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-     echo "Version: $version"
+        $version = Get-Content version.txt -Raw
+        $version = $version.Trim()
+echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Version: $version"
 
     - name: Install WiX Toolset
       shell: pwsh
-run: |
+      run: |
         dotnet tool install --global wix --version 4.0.5
         wix --version
 
@@ -45,92 +45,142 @@ run: |
       run: dotnet test --no-restore --verbosity normal
       continue-on-error: true
 
-    - name: Publish application
+ - name: Publish application
       shell: pwsh
- run: |
+      run: |
+   $publishDir = "bin/Release/net8.0-windows10.0.26100.0/win-x64/publish"
         dotnet publish HSPrint.csproj `
           -c Release `
-   -r win-x64 `
-          --self-contained true `
+       -r win-x64 `
+    --self-contained true `
           -p:PublishSingleFile=false `
- -p:Version=${{ steps.version.outputs.VERSION }} `
-       -o ./artifacts/publish
+          -p:Version=${{ steps.version.outputs.VERSION }} `
+          -o "./$publishDir"
+  
+        Write-Host "Publish directory contents:"
+        Get-ChildItem $publishDir | Select-Object Name, Length
+
+  - name: Generate WiX file list
+      shell: pwsh
+      run: |
+        $publishDir = "bin/Release/net8.0-windows10.0.26100.0/win-x64/publish"
+        & ".\HSPrint.Installer\GenerateFileList.ps1" `
+          -PublishDir $publishDir `
+       -OutputFile "HSPrint.Installer\GeneratedFiles.wxs"
+        
+    Write-Host "Generated WiX file list"
+     if (Test-Path "HSPrint.Installer\GeneratedFiles.wxs") {
+     Write-Host "GeneratedFiles.wxs created successfully"
+          Get-Content "HSPrint.Installer\GeneratedFiles.wxs" | Select-Object -First 20
+        } else {
+     Write-Error "Failed to generate GeneratedFiles.wxs"
+          exit 1
+   }
 
     - name: Build MSI Installer
       shell: pwsh
       run: |
-    dotnet build HSPrint.Installer/HSPrint.Installer.wixproj `
+        dotnet build HSPrint.Installer/HSPrint.Installer.wixproj `
           -c Release `
-          -p:Version=${{ steps.version.outputs.VERSION }}
-   
+  -p:Version=${{ steps.version.outputs.VERSION }}
+      
         # Find and copy MSI
         $msi = Get-ChildItem -Path "HSPrint.Installer/bin/Release" -Filter "*.msi" -Recurse | Select-Object -First 1
-      if ($msi) {
-       New-Item -ItemType Directory -Path "./artifacts" -Force
+  if ($msi) {
+          New-Item -ItemType Directory -Path "./artifacts" -Force
           Copy-Item $msi.FullName -Destination "./artifacts/HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi"
-       Write-Host "MSI created: ./artifacts/HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi"
+  Write-Host "MSI created: ./artifacts/HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi"
+     
+          # Show MSI details
+          $msiFile = Get-Item "./artifacts/HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi"
+          Write-Host "MSI Size: $([math]::Round($msiFile.Length / 1MB, 2)) MB"
         } else {
-          Write-Error "MSI file not found!"
+ Write-Error "MSI file not found!"
           exit 1
         }
 
     - name: Copy install script
       shell: pwsh
-    run: |
-        Copy-Item install.ps1 -Destination ./artifacts/install.ps1
+      run: |
+ Copy-Item install.ps1 -Destination ./artifacts/install.ps1
 
   - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
-      name: HSPrint-${{ steps.version.outputs.VERSION }}
+name: HSPrint-${{ steps.version.outputs.VERSION }}
         path: |
-          ./artifacts/*.msi
+   ./artifacts/*.msi
           ./artifacts/install.ps1
 
-    - name: Upload to Supabase Storage
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
+  - name: Upload to Supabase Storage
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
       shell: pwsh
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      run: |
+   run: |
         $version = "${{ steps.version.outputs.VERSION }}"
- $msiFile = "./artifacts/HSPrintSetup-$version.msi"
-      
-      if (Test-Path $msiFile) {
+        $msiFile = "./artifacts/HSPrintSetup-$version.msi"
+    
+        if (Test-Path $msiFile) {
           $headers = @{
-       "Authorization" = "Bearer $env:SUPABASE_SERVICE_ROLE_KEY"
-       "Content-Type" = "application/x-msi"
+  "Authorization" = "Bearer $env:SUPABASE_SERVICE_ROLE_KEY"
+      "Content-Type" = "application/x-msi"
+     }
+        
+ $uploadUrl = "$env:SUPABASE_URL/storage/v1/object/hsprint-releases/HSPrintSetup-$version.msi"
+    
+     try {
+       Invoke-RestMethod -Uri $uploadUrl -Method POST -Headers $headers -InFile $msiFile
+            Write-Host "Successfully uploaded HSPrintSetup-$version.msi to Supabase Storage"
+    } catch {
+   Write-Host "Warning: Failed to upload to Supabase: $_"
           }
-      
-    $uploadUrl = "$env:SUPABASE_URL/storage/v1/object/hsprint-releases/HSPrintSetup-$version.msi"
-          
-          try {
-    Invoke-RestMethod -Uri $uploadUrl -Method POST -Headers $headers -InFile $msiFile
-     Write-Host "Successfully uploaded HSPrintSetup-$version.msi to Supabase Storage"
- } catch {
-            Write-Host "Warning: Failed to upload to Supabase: $_"
-    }
-        }
+   }
 
     - name: Create GitHub Release
-   if: startsWith(github.ref, 'refs/tags/v')
+      if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-name: HSPrint v${{ steps.version.outputs.VERSION }}
+        name: HSPrint v${{ steps.version.outputs.VERSION }}
         draft: false
-        prerelease: false
+   prerelease: false
         files: |
-        ./artifacts/HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi
- ./artifacts/install.ps1
+          ./artifacts/HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi
+          ./artifacts/install.ps1
         body: |
-          ## HSPrint v${{ steps.version.outputs.VERSION }}
-  
-          ### Installation
-     
-   **Option 1: MSI Installer (Recommended)**
-        1. Download `HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi`
+       ## HSPrint v${{ steps.version.outputs.VERSION }}
+      
+      ### Installation
+    
+ **Option 1: MSI Installer (Recommended)**
+    1. Download `HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi`
           2. Run the installer (double-click or use the PowerShell script)
-       3. HSPrint will automatically start and run on Windows
+          3. HSPrint will automatically start and run on Windows startup
+          
+          **Option 2: Automated Installation with PowerShell**
+          1. Download both `HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi` and `install.ps1`
+          2. Run PowerShell as Administrator
+          3. Execute: `.\install.ps1 -MsiPath "HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi"`
+          
+   ### Features
+          - ? Automatic startup configuration
+          - ? Windows Service integration
+          - ? ZPL, Image, and PDF printing support
+          - ? Local API on http://localhost:50246
+          - ? Swagger documentation at http://localhost:50246/swagger
+ 
+          ### Upgrade Notes
+     The installer will automatically:
+          - Stop running HSPrint instances
+      - Uninstall previous versions
+- Clear cache to ensure clean installation
+    - Configure Windows startup
+          
+   ### System Requirements
+   - Windows 10/11 or Windows Server 2016+
+          - Administrator rights for installation
+      
+     For more information, see the [README](https://github.com/${{ github.repository }}/blob/main/README.md)
