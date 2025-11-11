@@ -10,25 +10,74 @@ HSPrint is a local Windows service/console application that provides a REST API 
 - **Multiple Print Formats**: ZPL (Zebra), PNG images, and PDF documents
 - **Local & Network Printing**: Print to USB/local printers or network printers via TCP/IP
 - **REST API**: Simple HTTP API for easy integration
+- **Windows Service**: Runs as a service with automatic startup
 - **Auto-Update**: Automatic version checking and updates
+- **MSI Installer**: Professional Windows installer with auto-cleanup
 - **Logging**: Comprehensive logging with Serilog
 - **CORS Support**: Configured for web application access
 - **Swagger Documentation**: Interactive API documentation
-- **Cross-Platform Ready**: Designed for easy porting to Linux
 
 ## 📋 Prerequisites
 
 - Windows 10/11 or Windows Server 2016+
-- .NET 8.0 Runtime (included in self-contained builds)
-- Administrator rights (for printer access)
+- Administrator rights (for installation and printer access)
 
 ## 🚀 Quick Start
+
+### Installation (Production)
+
+**Option 1: MSI Installer (Recommended)**
+
+1. **Download the latest release** from [GitHub Releases](https://github.com/HiddeS03/HSPrint/releases)
+   - Download `HSPrintSetup-x.x.x.msi`
+
+2. **Run the installer**
+   - Double-click the MSI file
+   - Follow the installation wizard
+   - HSPrint will automatically start and configure itself to run on Windows startup
+
+3. **Verify installation**
+   ```powershell
+   curl http://localhost:50246/health
+   ```
+
+**Option 2: Automated PowerShell Installation**
+
+1. **Download files**
+   - `HSPrintSetup-x.x.x.msi`
+ - `install.ps1`
+
+2. **Run as Administrator**
+   ```powershell
+   # Interactive installation
+   .\install.ps1
+
+   # Silent installation
+   .\install.ps1 -Silent
+   ```
+
+The installer will automatically:
+- ✅ Stop running HSPrint instances
+- ✅ Uninstall previous versions
+- ✅ Clear cache for clean installation
+- ✅ Install new version
+- ✅ Configure Windows startup
+- ✅ Start the service
+
+**Option 3: Portable ZIP**
+
+For testing or portable deployment:
+1. Download `HSPrint-x.x.x.zip`
+2. Extract to your preferred location
+3. Run `HSPrint.exe`
+
+> ⚠️ **Note**: ZIP version does not install as a service or configure automatic startup
 
 ### Development
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/HSPrint.git
+   git clone https://github.com/HiddeS03/HSPrint.git
    cd HSPrint
    ```
 
@@ -45,21 +94,53 @@ HSPrint is a local Windows service/console application that provides a REST API 
 4. **Open Swagger UI**
    Navigate to: `http://localhost:50246`
 
-### Production
+## 📦 Building the Installer
 
-1. **Download the latest release** from GitHub releases or Supabase Storage
+See [INSTALLER.md](INSTALLER.md) for detailed instructions on building and customizing the installer.
 
-2. **Extract the archive** to your preferred location (e.g., `C:\Program Files\HSPrint`)
+**Quick build:**
 
-3. **Run the application**
-   ```bash
-   HSPrint.exe
-   ```
+```powershell
+# Using the build script
+.\build-installer.ps1 -Version "1.0.0"
 
-4. **Verify it's running**
-   ```bash
-   curl http://localhost:50246/health
- ```
+# Or double-click
+build-installer.bat
+```
+
+**Prerequisites for building:**
+- .NET 8 SDK
+- WiX Toolset 4: `dotnet tool install --global wix --version 4.0.5`
+
+## 🔄 Updating
+
+The installer handles updates automatically:
+
+1. Run the new installer
+2. It detects the existing installation
+3. Automatically uninstalls the old version
+4. Installs the new version
+5. Preserves your configuration
+
+**Or use the PowerShell script:**
+```powershell
+.\install.ps1 -MsiPath "HSPrintSetup-1.1.0.msi"
+```
+
+## 🗑️ Uninstalling
+
+**Via Windows Settings:**
+1. Open "Add or Remove Programs"
+2. Find "HSPrint"
+3. Click "Uninstall"
+
+**Via PowerShell:**
+```powershell
+# Find and uninstall
+$app = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | 
+        Where-Object { $_.DisplayName -like "*HSPrint*" }
+msiexec /x $app.PSChildName /qn
+```
 
 ## 📡 API Endpoints
 

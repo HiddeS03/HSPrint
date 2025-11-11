@@ -1,0 +1,15 @@
+<Project Sdk="WixToolset.Sdk/4.0.5">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputName>HSPrintSetup</OutputName>
+    <OutputType>Package</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="4.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+ <ProjectReference Include="..\HSPrint.csproj" />
+  </ItemGroup>
+</Project>

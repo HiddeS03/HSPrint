@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <None Include=".github\workflows\build.yml" />
+    <None Include="HSPrint.Installer\HSPrint.Installer.wixproj" />
   </ItemGroup>
 
 </Project>

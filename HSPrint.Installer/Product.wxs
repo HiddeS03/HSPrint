@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  
+  <?define ProductName = "HSPrint" ?>
+  <?define Manufacturer = "HS Software" ?>
+  <?define UpgradeCode = "A8B9C0D1-E2F3-4A5B-6C7D-8E9F0A1B2C3D" ?>
+  
+  <Package Name="$(var.ProductName)" 
+           Manufacturer="$(var.Manufacturer)" 
+           Version="!(bind.fileVersion.HSPrintExe)"
+           UpgradeCode="$(var.UpgradeCode)"
+        Language="1033"
+      Compressed="yes">
+    
+    <SummaryInformation Keywords="Installer" 
+          Description="HSPrint Printer Agent Installer" 
+       Manufacturer="$(var.Manufacturer)" />
+
+    <!-- Major upgrade: Uninstall previous versions -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed."
+          AllowSameVersionUpgrades="yes"
+   Schedule="afterInstallInitialize" />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Launch condition: Windows 10 or later -->
+    <Launch Condition="VersionNT &gt;= 603" 
+            Message="This application requires Windows 10 or later." />
+
+    <!-- Install to Program Files -->
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="HSPrint">
+        <Component Id="HSPrintFiles" Guid="B9C0D1E2-F3A4-5B6C-7D8E-9F0A1B2C3D4E">
+          <File Id="HSPrintExe" 
+            Source="$(var.HSPrint.TargetPath)" 
+                KeyPath="yes" />
+          
+    <File Source="$(var.HSPrint.TargetDir)*.dll" />
+          <File Source="$(var.HSPrint.TargetDir)*.json" />
+    <File Source="$(var.HSPrint.TargetDir)version.txt" />
+          <File Source="$(var.HSPrint.TargetDir)*.pdb" />
+
+  <!-- Create logs directory -->
+          <CreateFolder Directory="LogsFolder" />
+
+  <!-- Registry key to detect installation -->
+        <RegistryKey Root="HKLM" Key="Software\HSPrint">
+         <RegistryValue Type="string" Name="InstallPath" Value="[INSTALLFOLDER]" />
+<RegistryValue Type="string" Name="Version" Value="!(bind.fileVersion.HSPrintExe)" />
+</RegistryKey>
+
+          <!-- Service installation -->
+      <ServiceInstall Id="HSPrintService"
+      Type="ownProcess"
+      Name="HSPrintService"
+                  DisplayName="HSPrint Printer Agent"
+            Description="Local printer agent for HS Software - Handles ZPL, Image, and PDF printing"
+           Start="auto"
+              Account="LocalSystem"
+       ErrorControl="normal"
+         Arguments="--service">
+          <util:ServiceConfig
+              FirstFailureActionType="restart"
+  SecondFailureActionType="restart"
+              ThirdFailureActionType="restart"
+         RestartServiceDelayInSeconds="60" />
+        </ServiceInstall>
+
+          <ServiceControl Id="HSPrintServiceControl"
+            Name="HSPrintService"
+      Start="install"
+      Stop="both"
+              Remove="uninstall"
+            Wait="yes" />
+    </Component>
+
+        <!-- Logs subdirectory -->
+      <Directory Id="LogsFolder" Name="logs">
+          <Component Id="LogsFolder" Guid="C0D1E2F3-A4B5-6C7D-8E9F-0A1B2C3D4E5F">
+  <CreateFolder />
+  <RemoveFolder Id="RemoveLogsFolder" On="uninstall" />
+       <RegistryValue Root="HKCU" Key="Software\HSPrint" Type="string" Value="" KeyPath="yes" />
+     </Component>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+
+    <!-- Startup shortcut in Start Menu -->
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ProgramMenuDir" Name="HSPrint">
+ <Component Id="StartMenuShortcuts" Guid="D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A">
+  <Shortcut Id="StartMenuShortcut"
+    Name="HSPrint"
+    Description="HSPrint Printer Agent"
+        Target="[#HSPrintExe]"
+ WorkingDirectory="INSTALLFOLDER" />
+       <RemoveFolder Id="RemoveProgramMenuDir" On="uninstall" />
+ <RegistryValue Root="HKCU" Key="Software\HSPrint\Shortcuts" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <!-- Startup registry entry to run on Windows startup -->
+    <Component Id="StartupRegistry" Guid="E2F3A4B5-C6D7-8E9F-0A1B-2C3D4E5F6A7B" Directory="INSTALLFOLDER">
+      <RegistryKey Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Run">
+    <RegistryValue Type="string" Name="HSPrint" Value="&quot;[#HSPrintExe]&quot;" KeyPath="yes" />
+      </RegistryKey>
+    </Component>
+
+    <!-- Feature: Complete installation -->
+    <Feature Id="ProductFeature" Title="HSPrint" Level="1">
+ <ComponentRef Id="HSPrintFiles" />
+      <ComponentRef Id="LogsFolder" />
+   <ComponentRef Id="StartMenuShortcuts" />
+      <ComponentRef Id="StartupRegistry" />
+    </Feature>
+
+    <!-- UI: Use WixUI for installation dialog -->
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    <UIRef Id="WixUI_Minimal" />
+  </Package>
+</Wix>

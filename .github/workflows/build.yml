@@ -1,23 +1,39 @@
-name: Build and Deploy to Supabase
+name: Build and Release HSPrint
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master, main ]
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
 
-    steps:
+  steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+    uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
+
+    - name: Get version
+      id: version
+    shell: pwsh
+      run: |
+        $version = Get-Content version.txt -Raw
+        $version = $version.Trim()
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+      echo "Version: $version"
+
+    - name: Install WiX Toolset
+      shell: pwsh
+      run: |
+        dotnet tool install --global wix --version 4.0.5
+        wix --version
 
     - name: Restore dependencies
       run: dotnet restore
@@ -29,63 +45,127 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
       continue-on-error: true
 
-    - name: Publish
-      run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./artifacts
-
-    - name: Get version
-      id: version
+    - name: Publish application
       shell: pwsh
       run: |
-        $version = Get-Content version.txt
-        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-        echo "Version: $version"
+ dotnet publish HSPrint.csproj `
+          -c Release `
+          -r win-x64 `
+    --self-contained true `
+          -p:PublishSingleFile=false `
+       -p:Version=${{ steps.version.outputs.VERSION }} `
+          -o ./artifacts/publish
+
+    - name: Build MSI Installer
+      shell: pwsh
+  run: |
+        dotnet build HSPrint.Installer/HSPrint.Installer.wixproj `
+ -c Release `
+    -p:Version=${{ steps.version.outputs.VERSION }}
+      
+        # Find and copy MSI
+        $msi = Get-ChildItem -Path "HSPrint.Installer/bin/Release" -Filter "*.msi" -Recurse | Select-Object -First 1
+        if ($msi) {
+          New-Item -ItemType Directory -Path "./artifacts" -Force
+          Copy-Item $msi.FullName -Destination "./artifacts/HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi"
+       Write-Host "MSI created: ./artifacts/HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi"
+        }
 
     - name: Create ZIP archive
       shell: pwsh
       run: |
-        Compress-Archive -Path ./artifacts/* -DestinationPath HSPrint-${{ steps.version.outputs.VERSION }}.zip
+        Compress-Archive -Path ./artifacts/publish/* -DestinationPath ./artifacts/HSPrint-${{ steps.version.outputs.VERSION }}.zip
+
+    - name: Copy install script
+      shell: pwsh
+      run: |
+        Copy-Item install.ps1 -Destination ./artifacts/install.ps1
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: HSPrint-${{ steps.version.outputs.VERSION }}
+        path: ./artifacts/*
 
     - name: Upload to Supabase Storage
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
       shell: pwsh
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      run: |
+   run: |
         $version = "${{ steps.version.outputs.VERSION }}"
-        $fileName = "HSPrint-$version.zip"
-        $filePath = "./$fileName"
         
-        $headers = @{
-          "Authorization" = "Bearer $env:SUPABASE_SERVICE_ROLE_KEY"
-          "Content-Type" = "application/zip"
+      $files = @(
+       @{Name = "HSPrintSetup-$version.msi"; Type = "application/x-msi"},
+    @{Name = "HSPrint-$version.zip"; Type = "application/zip"}
+   )
+        
+    foreach ($file in $files) {
+          $filePath = "./artifacts/$($file.Name)"
+          if (Test-Path $filePath) {
+       $headers = @{
+              "Authorization" = "Bearer $env:SUPABASE_SERVICE_ROLE_KEY"
+    "Content-Type" = $file.Type
+            }
+  
+            $uploadUrl = "$env:SUPABASE_URL/storage/v1/object/hsprint-releases/$($file.Name)"
+            
+  try {
+Invoke-RestMethod -Uri $uploadUrl -Method POST -Headers $headers -InFile $filePath
+         Write-Host "Successfully uploaded $($file.Name) to Supabase Storage"
+  } catch {
+        Write-Host "Warning: Failed to upload $($file.Name): $_"
+ }
+          }
         }
-        
-        $uploadUrl = "$env:SUPABASE_URL/storage/v1/object/hsprint-releases/$fileName"
 
-        Invoke-RestMethod -Uri $uploadUrl -Method POST -Headers $headers -InFile $filePath
-        
-        Write-Host "Successfully uploaded $fileName to Supabase Storage"
-
-    - name: Create Release
-      id: create_release
-      if: github.ref == 'refs/heads/main'
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ steps.version.outputs.VERSION }}
-        name: Release ${{ steps.version.outputs.VERSION }}
+        name: HSPrint v${{ steps.version.outputs.VERSION }}
         draft: false
         prerelease: false
-        files: HSPrint-${{ steps.version.outputs.VERSION }}.zip
+        files: |
+          ./artifacts/HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi
+          ./artifacts/HSPrint-${{ steps.version.outputs.VERSION }}.zip
+       ./artifacts/install.ps1
         body: |
-          ## HSPrint ${{ steps.version.outputs.VERSION }}
-          
-          Download the latest version of HSPrint.
+ ## HSPrint v${{ steps.version.outputs.VERSION }}
           
           ### Installation
-          1. Download `HSPrint-${{ steps.version.outputs.VERSION }}.zip`
+   
+    **Option 1: MSI Installer (Recommended)**
+          1. Download `HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi`
+          2. Run the installer
+     3. HSPrint will automatically start and run on Windows startup
+      
+          **Option 2: Manual Installation with Script**
+          1. Download `HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi`
+          2. Download `install.ps1`
+          3. Run PowerShell as Administrator
+     4. Execute: `.\install.ps1`
+          
+     **Option 3: Portable ZIP**
+        1. Download `HSPrint-${{ steps.version.outputs.VERSION }}.zip`
           2. Extract to your preferred location
-          3. Run `HSPrint.exe`
+    3. Run `HSPrint.exe`
+        
+    ### Features
+          - Automatic startup configuration
+          - Windows Service integration
+       - ZPL, Image, and PDF printing support
+          - Local API on http://localhost:50246
+          - Swagger documentation at http://localhost:50246/swagger
+          
+          ### Upgrade Notes
+The installer will automatically:
+          - Stop running HSPrint instances
+  - Uninstall previous versions
+       - Clear cache to ensure clean installation
+          - Configure Windows startup
           
           For more information, see the [README](https://github.com/${{ github.repository }}/blob/main/README.md)

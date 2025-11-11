@@ -12,8 +12,8 @@ public class PrinterController : ControllerBase
 
     public PrinterController(IPrinterService printerService, ILogger<PrinterController> logger)
     {
-   _printerService = printerService;
-    _logger = logger;
+        _printerService = printerService;
+        _logger = logger;
     }
 
     /// <summary>

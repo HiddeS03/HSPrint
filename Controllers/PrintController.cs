@@ -26,16 +26,16 @@ public class PrintController : ControllerBase
     {
         _logger.LogInformation("POST /print/zpl - Printer: {Printer}", request.PrinterName);
 
- if (string.IsNullOrWhiteSpace(request.PrinterName) || string.IsNullOrWhiteSpace(request.Zpl))
+        if (string.IsNullOrWhiteSpace(request.PrinterName) || string.IsNullOrWhiteSpace(request.Zpl))
         {
             return BadRequest(new { error = "PrinterName and Zpl are required" });
         }
 
         var success = await _printService.PrintZpl(request.PrinterName, request.Zpl);
 
-   if (success)
+        if (success)
         {
-        return Ok(new { message = "Print job sent successfully", printer = request.PrinterName });
+            return Ok(new { message = "Print job sent successfully", printer = request.PrinterName });
         }
 
         return BadRequest(new { error = "Failed to send print job" });
@@ -47,45 +47,45 @@ public class PrintController : ControllerBase
     [HttpPost("zpl/tcp")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
- public async Task<ActionResult> PrintZplViaTcp([FromBody] ZplTcpPrintRequest request)
-  {
+    public async Task<ActionResult> PrintZplViaTcp([FromBody] ZplTcpPrintRequest request)
+    {
         _logger.LogInformation("POST /print/zpl/tcp - IP: {IP}:{Port}", request.Ip, request.Port);
 
-     if (string.IsNullOrWhiteSpace(request.Ip) || request.Port <= 0 || string.IsNullOrWhiteSpace(request.Zpl))
- {
+        if (string.IsNullOrWhiteSpace(request.Ip) || request.Port <= 0 || string.IsNullOrWhiteSpace(request.Zpl))
+        {
             return BadRequest(new { error = "IP, Port, and Zpl are required" });
-    }
+        }
 
         var success = await _printService.PrintZplViaTcp(request.Ip, request.Port, request.Zpl);
 
         if (success)
         {
-    return Ok(new { message = "Print job sent successfully via TCP", ip = request.Ip, port = request.Port });
+            return Ok(new { message = "Print job sent successfully via TCP", ip = request.Ip, port = request.Port });
         }
 
         return BadRequest(new { error = "Failed to send print job via TCP" });
     }
 
- /// <summary>
-  /// Print image (PNG) to a local printer
+    /// <summary>
+    /// Print image (PNG) to a local printer
     /// </summary>
     [HttpPost("image")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> PrintImage([FromBody] ImagePrintRequest request)
     {
-     _logger.LogInformation("POST /print/image - Printer: {Printer}", request.PrinterName);
+        _logger.LogInformation("POST /print/image - Printer: {Printer}", request.PrinterName);
 
         if (string.IsNullOrWhiteSpace(request.PrinterName) || string.IsNullOrWhiteSpace(request.Base64Png))
-    {
-         return BadRequest(new { error = "PrinterName and Base64Png are required" });
+        {
+            return BadRequest(new { error = "PrinterName and Base64Png are required" });
         }
 
         var success = await _printService.PrintImage(request.PrinterName, request.Base64Png);
 
         if (success)
         {
- return Ok(new { message = "Image print job sent successfully", printer = request.PrinterName });
+            return Ok(new { message = "Image print job sent successfully", printer = request.PrinterName });
         }
 
         return BadRequest(new { error = "Failed to send image print job" });
@@ -99,7 +99,7 @@ public class PrintController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> PrintPdf([FromBody] PdfPrintRequest request)
     {
-  _logger.LogInformation("POST /print/pdf - Printer: {Printer}", request.PrinterName);
+        _logger.LogInformation("POST /print/pdf - Printer: {Printer}", request.PrinterName);
 
         if (string.IsNullOrWhiteSpace(request.PrinterName) || string.IsNullOrWhiteSpace(request.Base64Pdf))
         {
@@ -108,10 +108,10 @@ public class PrintController : ControllerBase
 
         var success = await _printService.PrintPdf(request.PrinterName, request.Base64Pdf);
 
-      if (success)
+        if (success)
         {
-     return Ok(new { message = "PDF print job sent successfully", printer = request.PrinterName });
-  }
+            return Ok(new { message = "PDF print job sent successfully", printer = request.PrinterName });
+        }
 
         return BadRequest(new { error = "Failed to send PDF print job" });
     }

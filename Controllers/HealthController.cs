@@ -21,18 +21,18 @@ public class HealthController : ControllerBase
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-  public ActionResult GetHealth()
+    public ActionResult GetHealth()
     {
-  _logger.LogInformation("GET /health - Health check");
+        _logger.LogInformation("GET /health - Health check");
         var processId = System.Diagnostics.Process.GetCurrentProcess().Id;
- 
+
         return Ok(new
-  {
-       status = "ok",
-      pid = processId,
-   version = _version,
-        timestamp = DateTime.UtcNow
-     });
+        {
+            status = "ok",
+            pid = processId,
+            version = _version,
+            timestamp = DateTime.UtcNow
+        });
     }
 
     /// <summary>
@@ -43,12 +43,12 @@ public class HealthController : ControllerBase
     public ActionResult GetVersion()
     {
         _logger.LogInformation("GET /health/version - Version check");
-     
-   return Ok(new
- {
+
+        return Ok(new
+        {
             version = _version,
-     timestamp = DateTime.UtcNow
-     });
+            timestamp = DateTime.UtcNow
+        });
     }
 
     /// <summary>
@@ -58,26 +58,26 @@ public class HealthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> CheckUpdate([FromServices] Updater updater)
     {
-  _logger.LogInformation("GET /health/update - Update check");
-  
-var updateInfo = await updater.CheckForUpdates();
-   
-   if (updateInfo != null)
+        _logger.LogInformation("GET /health/update - Update check");
+
+        var updateInfo = await updater.CheckForUpdates();
+
+        if (updateInfo != null)
         {
-   return Ok(new
-   {
-             updateAvailable = true,
-currentVersion = _version,
-      newVersion = updateInfo.Version,
-   downloadUrl = updateInfo.DownloadUrl,
-      releaseNotes = updateInfo.ReleaseNotes
-       });
+            return Ok(new
+            {
+                updateAvailable = true,
+                currentVersion = _version,
+                newVersion = updateInfo.Version,
+                downloadUrl = updateInfo.DownloadUrl,
+                releaseNotes = updateInfo.ReleaseNotes
+            });
         }
 
         return Ok(new
-  {
-       updateAvailable = false,
-    currentVersion = _version
+        {
+            updateAvailable = false,
+            currentVersion = _version
         });
     }
 }

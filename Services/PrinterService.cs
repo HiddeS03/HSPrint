@@ -12,24 +12,24 @@ public class PrinterService : IPrinterService
     }
 
     public IEnumerable<string> ListInstalledPrinters()
-  {
-     try
+    {
+        try
         {
-  _logger.LogInformation("Fetching installed printers");
-   var printers = new List<string>();
-            
+            _logger.LogInformation("Fetching installed printers");
+            var printers = new List<string>();
+
             foreach (string printer in PrinterSettings.InstalledPrinters)
-          {
-    printers.Add(printer);
+            {
+                printers.Add(printer);
             }
-   
-  _logger.LogInformation("Found {Count} printers", printers.Count);
-    return printers;
+
+            _logger.LogInformation("Found {Count} printers", printers.Count);
+            return printers;
         }
         catch (Exception ex)
- {
-   _logger.LogError(ex, "Error fetching installed printers");
-       return Enumerable.Empty<string>();
+        {
+            _logger.LogError(ex, "Error fetching installed printers");
+            return Enumerable.Empty<string>();
         }
     }
 }
