@@ -3,7 +3,7 @@
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-HSPrint is a local Windows service/console application that provides a REST API for printing to local printers from web applications. It supports ZPL (Zebra), image (PNG), and PDF printing.
+HSPrint is a local Windows service that provides a REST API for printing to local printers from web applications. It includes a GUI configuration tool for easy service management via system tray. Supports ZPL (Zebra), image (PNG), and PDF printing.
 
 ## 🎯 Features
 
@@ -11,7 +11,11 @@ HSPrint is a local Windows service/console application that provides a REST API 
 - **Local & Network Printing**: Print to USB/local printers or network printers via TCP/IP
 - **REST API**: Simple HTTP API for easy integration
 - **Windows Service**: Runs as a service with automatic startup
-- **Auto-Update**: Automatic version checking and updates
+- **GUI Configuration Tool**: System tray application for service management
+  - Start/Stop service control
+  - Real-time log viewer
+  - Startup configuration
+  - Direct update checking
 - **MSI Installer**: Professional Windows installer with auto-cleanup
 - **Logging**: Comprehensive logging with Serilog
 - **CORS Support**: Configured for web application access
@@ -63,15 +67,46 @@ The installer will automatically:
 - ✅ Install new version
 - ✅ Configure Windows startup
 - ✅ Start the service
+- ✅ Launch the configuration tool in system tray
 
-**Option 3: Portable ZIP**
+## 🎛️ Configuration Tool
+
+After installation, the **HSPrint Configuration Tool** runs in the system tray, providing easy access to:
+
+### Features
+- **Service Control**: Start and stop the HSPrint service with one click
+- **Log Viewer**: Real-time view of the last 500 log entries
+- **Startup Settings**: Configure whether the configuration tool starts with Windows
+- **Update Checker**: Direct link to GitHub releases for updates
+- **System Tray Icon**: Quick access from the notification area
+
+### Usage
+
+1. **System Tray**: Look for the HSPrint icon in the Windows notification area (system tray)
+2. **Double-click** the icon to open the configuration window
+3. **Right-click** the icon for quick actions:
+   - Show Configuration
+   - Exit
+
+### Configuration Window
+
+The configuration window includes:
+- **Service Control** section showing current service status
+- **Start/Stop Service** buttons
+- **Settings** section with startup configuration
+- **Check for Updates** button linking to GitHub
+- **Log Viewer** displaying the latest service logs
+
+> 💡 **Tip**: The service continues running even when the configuration window is closed. The service runs as a Windows Service and is independent of the GUI tool.
+
+**Option 3: Portable ZIP (Development Only)**
 
 For testing or portable deployment:
 1. Download `HSPrint-x.x.x.zip`
 2. Extract to your preferred location
 3. Run `HSPrint.exe`
 
-> ⚠️ **Note**: ZIP version does not install as a service or configure automatic startup
+> ⚠️ **Note**: ZIP version does not install as a service, configuration tool, or automatic startup
 
 ### Development
 

@@ -33,7 +33,7 @@
   <StandardDirectory Id="ProgramFilesFolder">
       <Directory Id="INSTALLFOLDER" Name="HSPrint">
         
-    <!-- Main application component -->
+    <!-- Main service component -->
         <Component Id="HSPrintMainFiles" Guid="B9C0D1E2-F3A4-5B6C-7D8E-9F0A1B2C3D4E">
           <!-- Main executable - use relative path from publish directory -->
           <File Id="HSPrintExe" 
@@ -64,8 +64,7 @@
        Description="Local printer agent for HS Software - Handles ZPL, Image, and PDF printing"
            Start="auto"
       Account="LocalSystem"
-               ErrorControl="normal"
-   Arguments="--service">
+               ErrorControl="normal">
  <util:ServiceConfig
   FirstFailureActionType="restart"
      SecondFailureActionType="restart"
@@ -81,6 +80,22 @@
          Wait="yes" />
         </Component>
 
+        <!-- Configuration Tool component -->
+        <Component Id="HSPrintConfigTool" Guid="D2E3F4A5-B6C7-8D9E-0F1A-2B3C4D5E6F7A">
+          <File Id="ConfigToolExe" 
+                Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.exe" 
+                KeyPath="yes" />
+          <File Id="ConfigToolDll" 
+                Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.dll" />
+        </Component>
+
+        <!-- Configuration Tool startup -->
+        <Component Id="ConfigToolStartup" Guid="E3F4A5B6-C7D8-9E0F-1A2B-3C4D5E6F7A8B">
+          <RegistryKey Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Run">
+            <RegistryValue Type="string" Name="HSPrintConfig" Value="&quot;[#ConfigToolExe]&quot;" KeyPath="yes" />
+          </RegistryKey>
+        </Component>
+
       <!-- Logs subdirectory -->
  <Directory Id="LogsFolder" Name="logs">
      <Component Id="LogsFolder" Guid="C0D1E2F3-A4B5-6C7D-8E9F-0A1B2C3D4E5F">
@@ -92,14 +107,14 @@
       </Directory>
     </StandardDirectory>
 
-    <!-- Startup shortcut in Start Menu -->
+    <!-- Startup shortcut in Start Menu for Config Tool -->
     <StandardDirectory Id="ProgramMenuFolder">
       <Directory Id="ProgramMenuDir" Name="HSPrint">
    <Component Id="StartMenuShortcuts" Guid="D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A">
           <Shortcut Id="StartMenuShortcut"
-  Name="HSPrint"
-        Description="HSPrint Printer Agent"
-      Target="[#HSPrintExe]"
+  Name="HSPrint Configuration"
+        Description="HSPrint Configuration Tool"
+      Target="[#ConfigToolExe]"
           WorkingDirectory="INSTALLFOLDER" />
           <RemoveFolder Id="RemoveProgramMenuDir" On="uninstall" />
        <RegistryValue Root="HKCU" Key="Software\HSPrint\Shortcuts" Type="integer" Value="1" KeyPath="yes" />
@@ -107,21 +122,16 @@
       </Directory>
     </StandardDirectory>
 
-    <!-- Startup registry entry to run on Windows startup -->
-    <Component Id="StartupRegistry" Guid="E2F3A4B5-C6D7-8E9F-0A1B-2C3D4E5F6A7B" Directory="INSTALLFOLDER">
-      <RegistryKey Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Run">
-     <RegistryValue Type="string" Name="HSPrint" Value="&quot;[#HSPrintExe]&quot;" KeyPath="yes" />
-      </RegistryKey>
-    </Component>
-
     <!-- Feature: Complete installation -->
     <Feature Id="ProductFeature" Title="HSPrint" Level="1">
       <ComponentRef Id="HSPrintMainFiles" />
+      <ComponentRef Id="HSPrintConfigTool" />
+      <ComponentRef Id="ConfigToolStartup" />
       <ComponentRef Id="LogsFolder" />
       <ComponentRef Id="StartMenuShortcuts" />
-      <ComponentRef Id="StartupRegistry" />
       <!-- Include all published files -->
       <ComponentGroupRef Id="PublishedFiles" />
+      <ComponentGroupRef Id="ConfigToolFiles" />
     </Feature>
   </Package>
 </Wix>
