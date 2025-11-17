@@ -199,3 +199,5 @@ Write-Host "  - HSPrint-specific files: $($publishOnlyFiles.Count) components" -
 Write-Host "  - ConfigTool-specific files: $($configToolOnlyFiles.Count) components" -ForegroundColor White
 Write-Host "  - Total components: $(($sharedFiles.Count) + ($publishOnlyFiles.Count) + ($configToolOnlyFiles.Count))" -ForegroundColor White
 Write-Host ""
+
+exit 0
