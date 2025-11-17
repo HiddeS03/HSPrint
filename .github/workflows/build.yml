@@ -45,7 +45,7 @@ echo "VERSION=$version" >> $env:GITHUB_OUTPUT
       run: dotnet test --no-restore --verbosity normal
       continue-on-error: true
 
- - name: Publish application
+ - name: Publish HSPrint Service
       shell: pwsh
       run: |
    $publishDir = "bin/Release/net8.0-windows10.0.26100.0/win-x64/publish"
@@ -57,25 +57,53 @@ echo "VERSION=$version" >> $env:GITHUB_OUTPUT
           -p:Version=${{ steps.version.outputs.VERSION }} `
           -o "./$publishDir"
   
-        Write-Host "Publish directory contents:"
-        Get-ChildItem $publishDir | Select-Object Name, Length
+        Write-Host "HSPrint Service publish directory contents:"
+        Get-ChildItem $publishDir | Select-Object Name, Length | Select-Object -First 10
 
-  - name: Generate WiX file list
+  - name: Publish Configuration Tool
+      shell: pwsh
+      run: |
+        $configToolPublishDir = "bin/Release/net8.0-windows10.0.26100.0/win-x64/configtool"
+        dotnet publish HSPrint.ConfigTool/HSPrint.ConfigTool.csproj `
+          -c Release `
+          -r win-x64 `
+          --self-contained true `
+          -p:PublishSingleFile=false `
+          -p:Version=${{ steps.version.outputs.VERSION }} `
+          -o "./$configToolPublishDir"
+  
+        Write-Host "Configuration Tool publish directory contents:"
+        Get-ChildItem $configToolPublishDir | Select-Object Name, Length | Select-Object -First 10
+
+  - name: Generate WiX file lists
       shell: pwsh
       run: |
         $publishDir = "bin/Release/net8.0-windows10.0.26100.0/win-x64/publish"
+        $configToolPublishDir = "bin/Release/net8.0-windows10.0.26100.0/win-x64/configtool"
+        
+        Write-Host "Generating HSPrint Service file list..."
         & ".\HSPrint.Installer\GenerateFileList.ps1" `
           -PublishDir $publishDir `
        -OutputFile "HSPrint.Installer\GeneratedFiles.wxs"
         
-    Write-Host "Generated WiX file list"
+        Write-Host "Generating Configuration Tool file list..."
+        & ".\HSPrint.Installer\GenerateConfigToolFiles.ps1" `
+          -PublishDir $configToolPublishDir `
+          -OutputFile "HSPrint.Installer\GeneratedConfigToolFiles.wxs"
+        
+    Write-Host "Generated WiX file lists successfully"
      if (Test-Path "HSPrint.Installer\GeneratedFiles.wxs") {
      Write-Host "GeneratedFiles.wxs created successfully"
-          Get-Content "HSPrint.Installer\GeneratedFiles.wxs" | Select-Object -First 20
         } else {
      Write-Error "Failed to generate GeneratedFiles.wxs"
           exit 1
    }
+        if (Test-Path "HSPrint.Installer\GeneratedConfigToolFiles.wxs") {
+          Write-Host "GeneratedConfigToolFiles.wxs created successfully"
+        } else {
+          Write-Error "Failed to generate GeneratedConfigToolFiles.wxs"
+          exit 1
+        }
 
     - name: Build MSI Installer
       shell: pwsh
@@ -153,24 +181,35 @@ name: HSPrint-${{ steps.version.outputs.VERSION }}
         body: |
        ## HSPrint v${{ steps.version.outputs.VERSION }}
       
+      ### What's New
+      - ✨ **GUI Configuration Tool** with system tray support
+      - 🎛️ Service control (Start/Stop) from the configuration window
+      - 📊 Real-time log viewer
+      - ⚙️ Startup configuration toggle
+      - 🔄 Direct link to check for updates on GitHub
+      - 🔔 System tray notifications for service status
+      
       ### Installation
     
- **Option 1: MSI Installer (Recommended)**
+ **MSI Installer (Recommended)**
     1. Download `HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi`
           2. Run the installer (double-click or use the PowerShell script)
-          3. HSPrint will automatically start and run on Windows startup
+          3. HSPrint service will automatically start and run on Windows startup
+          4. Configuration tool will appear in system tray
           
-          **Option 2: Automated Installation with PowerShell**
+          **PowerShell Installation**
           1. Download both `HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi` and `install.ps1`
           2. Run PowerShell as Administrator
           3. Execute: `.\install.ps1 -MsiPath "HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi"`
           
    ### Features
-          - ? Automatic startup configuration
-          - ? Windows Service integration
-          - ? ZPL, Image, and PDF printing support
-          - ? Local API on http://localhost:50246
-          - ? Swagger documentation at http://localhost:50246/swagger
+          - ✅ Windows Service with automatic startup
+          - ✅ GUI Configuration Tool with system tray icon
+          - ✅ Service control (start/stop) from GUI
+          - ✅ Real-time log viewer
+          - ✅ ZPL, Image, and PDF printing support
+          - ✅ Local API on http://localhost:50246
+          - ✅ Swagger documentation at http://localhost:50246/swagger
  
           ### Upgrade Notes
      The installer will automatically:
@@ -178,6 +217,7 @@ name: HSPrint-${{ steps.version.outputs.VERSION }}
       - Uninstall previous versions
 - Clear cache to ensure clean installation
     - Configure Windows startup
+          - Launch the configuration tool
           
    ### System Requirements
    - Windows 10/11 or Windows Server 2016+
