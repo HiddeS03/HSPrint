@@ -21,6 +21,9 @@ try
     // Add Serilog
     builder.Host.UseSerilog();
 
+    // Add Windows Service support
+    builder.Host.UseWindowsService();
+
     // Read version from version.txt
     string version = "1.0.0";
     try

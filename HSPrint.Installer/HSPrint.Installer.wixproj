@@ -12,5 +12,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HSPrint.csproj" />
+    <ProjectReference Include="..\HSPrint.ConfigTool\HSPrint.ConfigTool.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="GeneratedFiles.wxs" />
+    <Compile Include="GeneratedConfigToolFiles.wxs" />
   </ItemGroup>
 </Project>
