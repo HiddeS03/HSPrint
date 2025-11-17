@@ -67,7 +67,16 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-Write-Host "✓ WiX file lists generated successfully" -ForegroundColor Green
+Write-Host ""
+Write-Host "Validating WiX file generation..." -ForegroundColor Yellow
+& ".\HSPrint.Installer\ValidateWixGeneration.ps1"
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "WiX file validation failed"
+    exit 1
+}
+
+Write-Host "✓ WiX file lists generated and validated successfully" -ForegroundColor Green
 Write-Host ""
 
 Write-Host "Step 4: Building MSI Installer..." -ForegroundColor Yellow

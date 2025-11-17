@@ -92,20 +92,12 @@ jobs:
           exit 1
         }
         
-        Write-Host "Verifying generated files..."
-        $requiredFiles = @(
-          "HSPrint.Installer\GeneratedFiles.wxs",
-          "HSPrint.Installer\GeneratedConfigToolFiles.wxs",
-          "HSPrint.Installer\GeneratedSharedFiles.wxs"
-        )
+        Write-Host "`nValidating generated WiX files..."
+        & ".\HSPrint.Installer\ValidateWixGeneration.ps1"
         
-        foreach ($file in $requiredFiles) {
-          if (Test-Path $file) {
-            Write-Host "  ✓ $file created successfully"
-          } else {
-            Write-Error "Failed to generate $file"
-            exit 1
-          }
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "WiX file validation failed"
+          exit 1
         }
 
     - name: Build MSI Installer
