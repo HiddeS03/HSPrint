@@ -129,7 +129,9 @@
       <ComponentRef Id="ConfigToolStartup" />
       <ComponentRef Id="LogsFolder" />
       <ComponentRef Id="StartMenuShortcuts" />
-      <!-- Include all published files -->
+      <!-- Include shared runtime files (used by both applications) -->
+      <ComponentGroupRef Id="SharedRuntimeFiles" />
+      <!-- Include application-specific files -->
       <ComponentGroupRef Id="PublishedFiles" />
       <ComponentGroupRef Id="ConfigToolFiles" />
     </Feature>

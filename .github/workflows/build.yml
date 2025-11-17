@@ -81,27 +81,22 @@ jobs:
         $publishDir = "bin/Release/net8.0-windows10.0.26100.0/win-x64/publish"
         $configToolPublishDir = "bin/Release/net8.0-windows10.0.26100.0/win-x64/configtool"
         
-        Write-Host "Generating HSPrint Service file list..."
-        & ".\HSPrint.Installer\GenerateFileList.ps1" `
+        Write-Host "Generating WiX file lists with proper shared file handling..."
+        & ".\HSPrint.Installer\GenerateWixFiles.ps1" `
           -PublishDir $publishDir `
-          -OutputFile "HSPrint.Installer\GeneratedFiles.wxs"
+          -ConfigToolPublishDir $configToolPublishDir `
+          -OutputDir "HSPrint.Installer"
         
-        Write-Host "Generating Configuration Tool file list..."
-        & ".\HSPrint.Installer\GenerateConfigToolFiles.ps1" `
-          -PublishDir $configToolPublishDir `
-          -OutputFile "HSPrint.Installer\GeneratedConfigToolFiles.wxs"
-        
-        Write-Host "Generated WiX file lists successfully"
-        if (Test-Path "HSPrint.Installer\GeneratedFiles.wxs") {
-          Write-Host "GeneratedFiles.wxs created successfully"
-        } else {
-          Write-Error "Failed to generate GeneratedFiles.wxs"
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "Failed to generate WiX file lists"
           exit 1
         }
-        if (Test-Path "HSPrint.Installer\GeneratedConfigToolFiles.wxs") {
-          Write-Host "GeneratedConfigToolFiles.wxs created successfully"
-        } else {
-          Write-Error "Failed to generate GeneratedConfigToolFiles.wxs"
+        
+        Write-Host "`nValidating generated WiX files..."
+        & ".\HSPrint.Installer\ValidateWixGeneration.ps1"
+        
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "WiX file validation failed"
           exit 1
         }
 

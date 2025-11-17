@@ -57,25 +57,26 @@ Write-Host "✓ Configuration Tool published successfully" -ForegroundColor Gree
 Write-Host ""
 
 Write-Host "Step 3: Generating WiX file lists..." -ForegroundColor Yellow
-& ".\HSPrint.Installer\GenerateFileList.ps1" `
+& ".\HSPrint.Installer\GenerateWixFiles.ps1" `
     -PublishDir $publishDir `
-    -OutputFile "HSPrint.Installer\GeneratedFiles.wxs"
+    -ConfigToolPublishDir $configToolPublishDir `
+    -OutputDir "HSPrint.Installer"
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to generate file list"
+    Write-Error "Failed to generate WiX file lists"
     exit 1
 }
 
-& ".\HSPrint.Installer\GenerateConfigToolFiles.ps1" `
-    -PublishDir $configToolPublishDir `
-    -OutputFile "HSPrint.Installer\GeneratedConfigToolFiles.wxs"
+Write-Host ""
+Write-Host "Validating WiX file generation..." -ForegroundColor Yellow
+& ".\HSPrint.Installer\ValidateWixGeneration.ps1"
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to generate ConfigTool file list"
+    Write-Error "WiX file validation failed"
     exit 1
 }
 
-Write-Host "✓ WiX file lists generated successfully" -ForegroundColor Green
+Write-Host "✓ WiX file lists generated and validated successfully" -ForegroundColor Green
 Write-Host ""
 
 Write-Host "Step 4: Building MSI Installer..." -ForegroundColor Yellow
