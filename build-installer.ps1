@@ -113,6 +113,7 @@ if ($msi) {
     $msiFile = Get-Item $finalMsiPath
     Write-Host "  Size: $([math]::Round($msiFile.Length / 1MB, 2)) MB" -ForegroundColor Gray
     Write-Host ""
+    exit 0
 } else {
     Write-Error "MSI file not found after build!"
     exit 1
