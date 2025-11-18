@@ -1,31 +1,48 @@
 using System.Diagnostics;
+using System.Drawing;
+using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Windows.Forms;
-using System.Drawing;
 
 namespace HSPrint.ConfigTool;
 
 public partial class ConfigForm : Form
 {
+    // DWM API for title bar coloring
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+
+    private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+    private const int DWMWA_CAPTION_COLOR = 35;
+
     private readonly NotifyIcon _notifyIcon;
     private readonly System.Windows.Forms.Timer _statusTimer;
     private const string ServiceName = "HSPrintService";
     private const string GitHubReleasesUrl = "https://github.com/HiddeS03/HSPrint/releases";
-    private const string LogDirectory = @"C:\Program Files\HSPrint\logs";
+    private static readonly string LogDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "HSPrint", "logs");
 
     public ConfigForm()
     {
         InitializeComponent();
 
+        // Apply custom title bar color #287583 (RGB: 40, 117, 131)
+        ApplyTitleBarColor();
+
         // Setup system tray icon
         _notifyIcon = new NotifyIcon
         {
-            Icon = SystemIcons.Application,
+            Icon = LoadApplicationIcon(),
             Text = "HSPrint Configuration",
             Visible = true,
             ContextMenuStrip = CreateContextMenu()
         };
         _notifyIcon.DoubleClick += (s, e) => ShowForm();
+
+        // Set form icon
+        this.Icon = _notifyIcon.Icon;
+
+        // Position window bottom right near system tray
+        PositionWindowBottomRight();
 
         // Setup status timer to refresh service status
         _statusTimer = new System.Windows.Forms.Timer
@@ -54,7 +71,28 @@ public partial class ConfigForm : Form
     {
         Show();
         WindowState = FormWindowState.Normal;
+        PositionWindowBottomRight();
         Activate();
+    }
+
+    private void ApplyTitleBarColor()
+    {
+        if (Environment.OSVersion.Version.Build >= 22000) // Windows 11
+        {
+            // Color #287583 (RGB: 40, 117, 131) in BGR format: 0x00837528
+            int titleBarColor = 0x00837528;
+            DwmSetWindowAttribute(this.Handle, DWMWA_CAPTION_COLOR, ref titleBarColor, sizeof(int));
+        }
+    }
+
+    private void PositionWindowBottomRight()
+    {
+        var workingArea = Screen.PrimaryScreen?.WorkingArea ?? Screen.PrimaryScreen!.Bounds;
+        this.StartPosition = FormStartPosition.Manual;
+        this.Location = new Point(
+            workingArea.Right - this.Width - 20,
+            workingArea.Bottom - this.Height - 20
+        );
     }
 
     private void ExitApplication()
@@ -82,7 +120,7 @@ public partial class ConfigForm : Form
             {
                 service.Refresh();
                 bool isRunning = service.Status == ServiceControllerStatus.Running;
-                
+
                 lblServiceStatus.Text = isRunning ? "Running" : "Stopped";
                 lblServiceStatus.ForeColor = isRunning ? Color.Green : Color.Red;
                 btnStartService.Enabled = !isRunning;
@@ -128,7 +166,7 @@ public partial class ConfigForm : Form
         {
             if (!Directory.Exists(LogDirectory))
             {
-                txtLogs.Text = "Log directory not found.";
+                txtLogs.Text = $"Log directory not found: {LogDirectory}\n\nLogs will be created here when the service runs.";
                 return;
             }
 
@@ -140,8 +178,19 @@ public partial class ConfigForm : Form
             if (logFiles.Any())
             {
                 var latestLog = logFiles.First();
-                var lines = File.ReadAllLines(latestLog);
-                txtLogs.Text = string.Join(Environment.NewLine, lines.TakeLast(500));
+
+                // Open file with FileShare.ReadWrite to allow reading while service is writing
+                using var fileStream = new FileStream(latestLog, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new StreamReader(fileStream);
+
+                var allLines = new List<string>();
+                string? line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    allLines.Add(line);
+                }
+
+                txtLogs.Text = string.Join(Environment.NewLine, allLines.TakeLast(500));
                 txtLogs.SelectionStart = txtLogs.Text.Length;
                 txtLogs.ScrollToCaret();
             }
@@ -193,17 +242,31 @@ public partial class ConfigForm : Form
         try
         {
             var service = GetService();
-            if (service != null && service.Status == ServiceControllerStatus.Running)
+            if (service == null)
+            {
+                MessageBox.Show("Service not found. Please check if HSPrint is installed correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (service.Status == ServiceControllerStatus.Running)
             {
                 service.Stop();
                 service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
                 UpdateServiceStatus();
                 MessageBox.Show("Service stopped successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+            else
+            {
+                MessageBox.Show($"Service is not running. Current status: {service.Status}", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        catch (System.InvalidOperationException ex)
+        {
+            MessageBox.Show($"Cannot access service. Please run as administrator.\n\nDetails: {ex.Message}", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error stopping service: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Error stopping service: {ex.Message}\n\nPlease ensure you have administrative privileges.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -213,7 +276,7 @@ public partial class ConfigForm : Form
         {
             using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
                 @"Software\Microsoft\Windows\CurrentVersion\Run", true);
-            
+
             if (key != null)
             {
                 if (chkStartWithWindows.Checked)
@@ -255,4 +318,30 @@ public partial class ConfigForm : Form
         }
     }
 
+    private Icon LoadApplicationIcon()
+    {
+        try
+        {
+            // Try to load icon from file (when running from installation directory)
+            var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logo.ico");
+            if (File.Exists(iconPath))
+            {
+                return new Icon(iconPath);
+            }
+
+            // Try to load from assets directory (development)
+            iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "assets", "logo.ico");
+            if (File.Exists(iconPath))
+            {
+                return new Icon(iconPath);
+            }
+        }
+        catch
+        {
+            // Ignore errors and fall back to default
+        }
+
+        // Fallback to system icon
+        return SystemIcons.Application;
+    }
 }
