@@ -218,12 +218,12 @@ foreach ($file in $problematicFiles) {
         $validationWarnings += "$file not found in any component group"
     } elseif ($locations.Count -eq 1) {
         Write-Host "  âœ" '$file' only in $($locations[0])" -ForegroundColor Green
-    }
-    else {
-        Write-Host "  âœ— '$file' found in multiple locations: $($locations -join ', ')" -ForegroundColor Red
-        $validationErrors += "$file found in multiple locations"
-        $problematicFilesOk = $false
-    }
+}
+else {
+    Write-Host "  âœ— '$file' found in multiple locations: $($locations -join ', ')" -ForegroundColor Red
+    $validationErrors += "$file found in multiple locations"
+    $problematicFilesOk = $false
+}
 }
 
 Write-Host ""
