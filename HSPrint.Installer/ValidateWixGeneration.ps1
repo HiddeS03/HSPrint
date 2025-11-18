@@ -88,7 +88,7 @@ $filesToCheck = @($SharedFilesPath, $PublishedFilesPath, $ConfigToolFilesPath)
 $allFilesExist = $true
 foreach ($file in $filesToCheck) {
     if (Test-Path $file) {
-        Write-Host "  âœ“ $file exists" -ForegroundColor Green
+        Write-Host "  ✓ $file exists" -ForegroundColor Green
     } else {
         Write-Host "  âœ— $file not found" -ForegroundColor Red
         $validationErrors += "$file not found"
@@ -107,7 +107,7 @@ Write-Host "Step 2: Validating XML structure..." -ForegroundColor Yellow
 foreach ($file in $filesToCheck) {
     try {
         [xml]$xml = Get-Content $file
-        Write-Host "  âœ“ $file is valid XML" -ForegroundColor Green
+        Write-Host "  ✓ $file is valid XML" -ForegroundColor Green
     }
     catch {
         Write-Host "  âœ— $file has invalid XML: $_" -ForegroundColor Red
@@ -140,7 +140,7 @@ if ($duplicateComponents) {
     }
 }
 else {
-    Write-Host "  âœ“ No duplicate component IDs found" -ForegroundColor Green
+    Write-Host "  ✓ No duplicate component IDs found" -ForegroundColor Green
 }
 
 Write-Host ""
@@ -167,7 +167,7 @@ if ($duplicateFileIds) {
         $validationErrors += "Duplicate file ID: $($dup.Key)"
     }
 } else {
-    Write-Host "  âœ“ No duplicate file IDs found" -ForegroundColor Green
+    Write-Host "  ✓ No duplicate file IDs found" -ForegroundColor Green
 }
 
 Write-Host ""
@@ -199,7 +199,7 @@ if ($configToolOverlap) {
 }
 
 if (-not $publishedOverlap -and -not $configToolOverlap) {
-    Write-Host "  âœ“ No file name overlaps between component groups" -ForegroundColor Green
+    Write-Host "  ✓ No file name overlaps between component groups" -ForegroundColor Green
 }
 
 Write-Host ""
@@ -217,13 +217,12 @@ foreach ($file in $problematicFiles) {
         Write-Host "  âš  '$file' not found in any component group" -ForegroundColor Yellow
         $validationWarnings += "$file not found in any component group"
     } elseif ($locations.Count -eq 1) {
-        Write-Host "  âœ" '$file' only in $($locations[0])" -ForegroundColor Green
-}
-else {
-    Write-Host "  âœ— '$file' found in multiple locations: $($locations -join ', ')" -ForegroundColor Red
-    $validationErrors += "$file found in multiple locations"
-    $problematicFilesOk = $false
-}
+        Write-Host "  ✓ '$file' only in $($locations[0])" -ForegroundColor Green
+    } else {
+        Write-Host "  âœ— '$file' found in multiple locations: $($locations -join ', ')" -ForegroundColor Red
+        $validationErrors += "$file found in multiple locations"
+        $problematicFilesOk = $false
+    }
 }
 
 Write-Host ""
