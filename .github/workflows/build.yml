@@ -6,6 +6,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (leave empty to auto-increment)'
+        required: false
+        type: string
 
 jobs:
   build:
@@ -14,20 +19,61 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
 
-    - name: Get version
+    - name: Determine version
       id: version
       shell: pwsh
       run: |
-        $version = Get-Content version.txt -Raw
-        $version = $version.Trim()
+        # Read current version from file
+        $currentVersion = (Get-Content version.txt -Raw).Trim()
+        Write-Host "Current version: $currentVersion"
+        
+        # Use manual version if provided, otherwise auto-increment
+        if ("${{ github.event.inputs.version }}" -ne "") {
+          $version = "${{ github.event.inputs.version }}"
+          Write-Host "Using manual version: $version"
+        } else {
+          # Auto-increment patch version
+          $parts = $currentVersion -split '\.'
+          $major = [int]$parts[0]
+          $minor = [int]$parts[1]
+          $patch = [int]$parts[2]
+          $patch++
+          $version = "$major.$minor.$patch"
+          Write-Host "Auto-incremented version: $version"
+        }
+        
+        # Update version.txt
+        Set-Content -Path version.txt -Value $version -NoNewline
+        
+        # Output version for later steps
         echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-        echo "Version: $version"
+        Write-Host "Final version: $version"
+
+    - name: Commit version bump
+      shell: pwsh
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "github-actions@github.com"
+        git add version.txt
+        
+        # Only commit if there are changes
+        $status = git status --porcelain
+        if ($status) {
+          git commit -m "chore: bump version to ${{ steps.version.outputs.VERSION }}"
+          git push
+          Write-Host "Version committed and pushed"
+        } else {
+          Write-Host "No version changes to commit"
+        }
 
     - name: Install WiX Toolset
       shell: pwsh
@@ -161,15 +207,34 @@ jobs:
           }
         }
 
+    - name: Create Git Tag
+      shell: pwsh
+      run: |
+        $version = "${{ steps.version.outputs.VERSION }}"
+        $tag = "v$version"
+        
+        # Check if tag exists
+        git fetch --tags
+        $existingTag = git tag -l $tag
+        
+        if (-not $existingTag) {
+          git tag $tag
+          git push origin $tag
+          Write-Host "Created and pushed tag: $tag"
+        } else {
+          Write-Host "Tag $tag already exists"
+        }
+
     - name: Create GitHub Release
-      if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
+        tag_name: v${{ steps.version.outputs.VERSION }}
         name: HSPrint v${{ steps.version.outputs.VERSION }}
         draft: false
         prerelease: false
+        generate_release_notes: true
         files: |
           ./artifacts/HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi
           ./artifacts/install.ps1
