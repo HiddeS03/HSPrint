@@ -3,8 +3,6 @@ name: Build and Release HSPrint
 on:
   push:
     branches: [ master, main ]
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       version:
@@ -20,10 +18,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-<<<<<<< HEAD
         fetch-depth: 0
-=======
->>>>>>> c5168f7bd2f1aac4ffed129b593b7c7c3978ed00
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup .NET
@@ -31,7 +26,6 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-<<<<<<< HEAD
     - name: Determine version
       id: version
       shell: pwsh
@@ -59,81 +53,20 @@ jobs:
         Set-Content -Path version.txt -Value $version -NoNewline
         
         # Output version for later steps
-=======
-    - name: Bump version
-      id: version
-      shell: pwsh
-      run: |
-        # Read current version
-        $version = Get-Content version.txt -Raw
-        $version = $version.Trim()
-        
-        # Parse semantic version
-        $parts = $version.Split('.')
-        $major = [int]$parts[0]
-        $minor = [int]$parts[1]
-        $patch = [int]$parts[2]
-        
-        # Increment patch version for every push to main/master
-        if ("${{ github.ref }}" -eq "refs/heads/main" -or "${{ github.ref }}" -eq "refs/heads/master") {
-          $patch++
-          $newVersion = "$major.$minor.$patch"
-          
-          # Update version.txt
-          Set-Content -Path version.txt -Value $newVersion -NoNewline
-          
-          # Update HSPrint.csproj using XML
-          [xml]$csproj = Get-Content HSPrint.csproj
-          $versionNode = $csproj.Project.PropertyGroup.Version
-          if ($versionNode) {
-            $csproj.Project.PropertyGroup.Version = $newVersion
-          } else {
-            $versionElement = $csproj.CreateElement("Version")
-            $versionElement.InnerText = $newVersion
-            $csproj.Project.PropertyGroup[0].AppendChild($versionElement) | Out-Null
-          }
-          $csproj.Save((Resolve-Path HSPrint.csproj))
-          
-          # Update HSPrint.ConfigTool.csproj using XML
-          [xml]$configCsproj = Get-Content HSPrint.ConfigTool/HSPrint.ConfigTool.csproj
-          $configVersionNode = $configCsproj.Project.PropertyGroup.Version
-          if ($configVersionNode) {
-            $configCsproj.Project.PropertyGroup.Version = $newVersion
-          } else {
-            $versionElement = $configCsproj.CreateElement("Version")
-            $versionElement.InnerText = $newVersion
-            $configCsproj.Project.PropertyGroup[0].AppendChild($versionElement) | Out-Null
-          }
-          $configCsproj.Save((Resolve-Path HSPrint.ConfigTool/HSPrint.ConfigTool.csproj))
-          
-          # Commit and push version bump
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add version.txt HSPrint.csproj HSPrint.ConfigTool/HSPrint.ConfigTool.csproj
-          git commit -m "chore: bump version to $newVersion [skip ci]"
-          git push
-          
-          $version = $newVersion
-          Write-Host "Version bumped to: $version"
-        } else {
-          Write-Host "Not on main/master branch, using version: $version"
-        }
-        
->>>>>>> c5168f7bd2f1aac4ffed129b593b7c7c3978ed00
         echo "VERSION=$version" >> $env:GITHUB_OUTPUT
         Write-Host "Final version: $version"
 
     - name: Commit version bump
       shell: pwsh
       run: |
-        git config user.name "GitHub Actions"
-        git config user.email "github-actions@github.com"
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
         git add version.txt
         
         # Only commit if there are changes
         $status = git status --porcelain
         if ($status) {
-          git commit -m "chore: bump version to ${{ steps.version.outputs.VERSION }}"
+          git commit -m "chore: bump version to ${{ steps.version.outputs.VERSION }} [skip ci]"
           git push
           Write-Host "Version committed and pushed"
         } else {
@@ -246,33 +179,6 @@ jobs:
           ./artifacts/*.msi
           ./artifacts/install.ps1
 
-<<<<<<< HEAD
-    - name: Upload to Supabase Storage
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
-      shell: pwsh
-      env:
-        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      run: |
-        $version = "${{ steps.version.outputs.VERSION }}"
-        $msiFile = "./artifacts/HSPrintSetup-$version.msi"
-        
-        if (Test-Path $msiFile) {
-          $headers = @{
-            "Authorization" = "Bearer $env:SUPABASE_SERVICE_ROLE_KEY"
-            "Content-Type" = "application/x-msi"
-          }
-        
-          $uploadUrl = "$env:SUPABASE_URL/storage/v1/object/hsprint-releases/HSPrintSetup-$version.msi"
-        
-          try {
-            Invoke-RestMethod -Uri $uploadUrl -Method POST -Headers $headers -InFile $msiFile
-            Write-Host "Successfully uploaded HSPrintSetup-$version.msi to Supabase Storage"
-          } catch {
-            Write-Host "Warning: Failed to upload to Supabase: $_"
-          }
-        }
-
     - name: Create Git Tag
       shell: pwsh
       run: |
@@ -291,8 +197,6 @@ jobs:
           Write-Host "Tag $tag already exists"
         }
 
-=======
->>>>>>> c5168f7bd2f1aac4ffed129b593b7c7c3978ed00
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       env:
@@ -309,26 +213,18 @@ jobs:
         body: |
           ## HSPrint v${{ steps.version.outputs.VERSION }}
           
-          ### What's New
-          - ✨ **GUI Configuration Tool** with system tray support
-          - 🎛️ Service control (Start/Stop) from the configuration window
-          - 📊 Real-time log viewer
-          - ⚙️ Startup configuration toggle
-          - 🔄 Direct link to check for updates on GitHub
-          - 🔔 System tray notifications for service status
-          
           ### Installation
           
           **MSI Installer (Recommended)**
           1. Download `HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi`
-          2. Run the installer (double-click or use the PowerShell script)
-          3. HSPrint service will automatically start and run on Windows startup
+          2. Run the installer (double-click)
+          3. HSPrint service will automatically start
           4. Configuration tool will appear in system tray
           
           **PowerShell Installation**
-          1. Download both `HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi` and `install.ps1`
-          2. Run PowerShell as Administrator
-          3. Execute: `.\install.ps1 -MsiPath "HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi"`
+          ```powershell
+          .\install.ps1 -MsiPath "HSPrintSetup-${{ steps.version.outputs.VERSION }}.msi"
+          ```
           
           ### Features
           - ✅ Windows Service with automatic startup
@@ -336,19 +232,9 @@ jobs:
           - ✅ Service control (start/stop) from GUI
           - ✅ Real-time log viewer
           - ✅ ZPL, Image, and PDF printing support
-          - ✅ Local API on http://localhost:50246
-          - ✅ Swagger documentation at http://localhost:50246/swagger
-          
-          ### Upgrade Notes
-          The installer will automatically:
-          - Stop running HSPrint instances
-          - Uninstall previous versions
-          - Clear cache to ensure clean installation
-          - Configure Windows startup
-          - Launch the configuration tool
+          - ✅ REST API on http://localhost:50246
+          - ✅ Swagger documentation at /swagger
           
           ### System Requirements
           - Windows 10/11 or Windows Server 2016+
           - Administrator rights for installation
-          
-          For more information, see the [README](https://github.com/${{ github.repository }}/blob/main/README.md)
