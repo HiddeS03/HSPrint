@@ -239,7 +239,7 @@ Write-Host "  - Total components: $(($sharedFiles.Count) + ($publishedFiles.Coun
 Write-Host ""
 
 if ($validationErrors.Count -eq 0) {
-    Write-Host "âœ“ Validation PASSED" -ForegroundColor Green -BackgroundColor Black
+    Write-Host "[OK] Validation PASSED" -ForegroundColor Green -BackgroundColor Black
     if ($validationWarnings.Count -gt 0) {
         Write-Host ""
         Write-Host "Warnings ($($validationWarnings.Count)):" -ForegroundColor Yellow
@@ -249,7 +249,7 @@ if ($validationErrors.Count -eq 0) {
     }
     exit 0
 } else {
-    Write-Host "âœ— Validation FAILED" -ForegroundColor Red -BackgroundColor Black
+    Write-Host "[FAILED] Validation FAILED" -ForegroundColor Red -BackgroundColor Black
     Write-Host ""
     Write-Host "Errors ($($validationErrors.Count)):" -ForegroundColor Red
     foreach ($validationError in $validationErrors) {
