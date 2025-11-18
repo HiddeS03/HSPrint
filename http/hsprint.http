@@ -1,0 +1,47 @@
+### Get health
+GET {{baseUrl}}/health
+
+### Get version
+GET {{baseUrl}}/health/version
+
+### Get printers
+GET {{baseUrl}}/printer
+
+### Print ZPL (local printer)
+POST {{baseUrl}}/print/zpl
+Content-Type: application/json
+
+{
+  "printerName": "{{printerName}}",
+  "zpl": "^XA^FO50,50^A0N,50,50^FDTest ZPL^FS^XZ"
+}
+
+### Print ZPL via TCP
+POST {{baseUrl}}/print/zpl/tcp
+Content-Type: application/json
+
+{
+  "ip": "{{ip}}",
+  "port": {{port}},
+  "zpl": "^XA^FO50,50^A0N,50,50^FDNetwork ZPL Test^FS^XZ"
+}
+
+### Print PNG (base64)
+# Replace `BASE64PNG` with an actual base64 encoded PNG or use a small placeholder
+POST {{baseUrl}}/print/image
+Content-Type: application/json
+
+{
+  "printerName": "{{printerName}}",
+  "base64Png": "BASE64PNG"
+}
+
+### Print PDF (base64)
+# Replace `BASE64PDF` with an actual base64 encoded PDF
+POST {{baseUrl}}/print/pdf
+Content-Type: application/json
+
+{
+  "printerName": "{{printerName}}",
+  "base64Pdf": "BASE64PDF"
+}

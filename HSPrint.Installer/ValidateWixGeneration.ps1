@@ -1,4 +1,4 @@
-# Validation script for WiX file generation
+﻿# Validation script for WiX file generation
 # This script validates the generated WiX files for common issues
 
 param(
@@ -11,9 +11,9 @@ $ErrorActionPreference = "Stop"
 $validationErrors = @()
 $validationWarnings = @()
 
-Write-Host "═══════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
 Write-Host "  WiX File Generation Validation" -ForegroundColor Cyan
-Write-Host "═══════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
 Write-Host ""
 
 # Function to extract component IDs from a WiX file
@@ -30,7 +30,8 @@ function Get-ComponentIds {
         $ns.AddNamespace("wix", "http://wixtoolset.org/schemas/v4/wxs")
         $components = $xml.SelectNodes("//wix:Component[@Id]", $ns)
         return $components | ForEach-Object { $_.GetAttribute("Id") }
-    } catch {
+    }
+    catch {
         Write-Host "Error parsing $filePath`: $_" -ForegroundColor Red
         return @()
     }
@@ -50,7 +51,8 @@ function Get-FileIds {
         $ns.AddNamespace("wix", "http://wixtoolset.org/schemas/v4/wxs")
         $files = $xml.SelectNodes("//wix:File[@Id]", $ns)
         return $files | ForEach-Object { $_.GetAttribute("Id") }
-    } catch {
+    }
+    catch {
         return @()
     }
 }
@@ -70,12 +72,13 @@ function Get-SourcePaths {
         $files = $xml.SelectNodes("//wix:File[@Source]", $ns)
         return $files | ForEach-Object { 
             [PSCustomObject]@{
-                FileId = $_.GetAttribute("Id")
-                Source = $_.GetAttribute("Source")
+                FileId   = $_.GetAttribute("Id")
+                Source   = $_.GetAttribute("Source")
                 FileName = Split-Path $_.GetAttribute("Source") -Leaf
             }
         }
-    } catch {
+    }
+    catch {
         return @()
     }
 }
@@ -85,9 +88,9 @@ $filesToCheck = @($SharedFilesPath, $PublishedFilesPath, $ConfigToolFilesPath)
 $allFilesExist = $true
 foreach ($file in $filesToCheck) {
     if (Test-Path $file) {
-        Write-Host "  ✓ $file exists" -ForegroundColor Green
+        Write-Host "  âœ“ $file exists" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ $file not found" -ForegroundColor Red
+        Write-Host "  âœ— $file not found" -ForegroundColor Red
         $validationErrors += "$file not found"
         $allFilesExist = $false
     }
@@ -104,9 +107,10 @@ Write-Host "Step 2: Validating XML structure..." -ForegroundColor Yellow
 foreach ($file in $filesToCheck) {
     try {
         [xml]$xml = Get-Content $file
-        Write-Host "  ✓ $file is valid XML" -ForegroundColor Green
-    } catch {
-        Write-Host "  ✗ $file has invalid XML: $_" -ForegroundColor Red
+        Write-Host "  âœ“ $file is valid XML" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "  âœ— $file has invalid XML: $_" -ForegroundColor Red
         $validationErrors += "$file has invalid XML: $_"
     }
 }
@@ -131,11 +135,12 @@ $duplicateComponents = $componentIdFiles.GetEnumerator() | Where-Object { $_.Val
 if ($duplicateComponents) {
     foreach ($dup in $duplicateComponents) {
         $files = $dup.Value -join ", "
-        Write-Host "  ✗ Duplicate component ID '$($dup.Key)' found in: $files" -ForegroundColor Red
+        Write-Host "  âœ— Duplicate component ID '$($dup.Key)' found in: $files" -ForegroundColor Red
         $validationErrors += "Duplicate component ID: $($dup.Key)"
     }
-} else {
-    Write-Host "  ✓ No duplicate component IDs found" -ForegroundColor Green
+}
+else {
+    Write-Host "  âœ“ No duplicate component IDs found" -ForegroundColor Green
 }
 
 Write-Host ""
@@ -158,11 +163,11 @@ $duplicateFileIds = $fileIdFiles.GetEnumerator() | Where-Object { $_.Value.Count
 if ($duplicateFileIds) {
     foreach ($dup in $duplicateFileIds) {
         $files = $dup.Value -join ", "
-        Write-Host "  ✗ Duplicate file ID '$($dup.Key)' found in: $files" -ForegroundColor Red
+        Write-Host "  âœ— Duplicate file ID '$($dup.Key)' found in: $files" -ForegroundColor Red
         $validationErrors += "Duplicate file ID: $($dup.Key)"
     }
 } else {
-    Write-Host "  ✓ No duplicate file IDs found" -ForegroundColor Green
+    Write-Host "  âœ“ No duplicate file IDs found" -ForegroundColor Green
 }
 
 Write-Host ""
@@ -179,7 +184,7 @@ $configToolFileNames = $configToolFiles | Select-Object -ExpandProperty FileName
 $publishedOverlap = $publishedFileNames | Where-Object { $sharedFileNames -contains $_ }
 if ($publishedOverlap) {
     foreach ($file in $publishedOverlap) {
-        Write-Host "  ⚠ File '$file' exists in both PublishedFiles and SharedRuntimeFiles" -ForegroundColor Yellow
+        Write-Host "  âš  File '$file' exists in both PublishedFiles and SharedRuntimeFiles" -ForegroundColor Yellow
         $validationWarnings += "File overlap: $file in PublishedFiles and SharedRuntimeFiles"
     }
 }
@@ -188,13 +193,13 @@ if ($publishedOverlap) {
 $configToolOverlap = $configToolFileNames | Where-Object { $sharedFileNames -contains $_ }
 if ($configToolOverlap) {
     foreach ($file in $configToolOverlap) {
-        Write-Host "  ⚠ File '$file' exists in both ConfigToolFiles and SharedRuntimeFiles" -ForegroundColor Yellow
+        Write-Host "  âš  File '$file' exists in both ConfigToolFiles and SharedRuntimeFiles" -ForegroundColor Yellow
         $validationWarnings += "File overlap: $file in ConfigToolFiles and SharedRuntimeFiles"
     }
 }
 
 if (-not $publishedOverlap -and -not $configToolOverlap) {
-    Write-Host "  ✓ No file name overlaps between component groups" -ForegroundColor Green
+    Write-Host "  âœ“ No file name overlaps between component groups" -ForegroundColor Green
 }
 
 Write-Host ""
@@ -209,21 +214,22 @@ foreach ($file in $problematicFiles) {
     if ($configToolFileNames -contains $file) { $locations += "ConfigToolFiles" }
     
     if ($locations.Count -eq 0) {
-        Write-Host "  ⚠ '$file' not found in any component group" -ForegroundColor Yellow
+        Write-Host "  âš  '$file' not found in any component group" -ForegroundColor Yellow
         $validationWarnings += "$file not found in any component group"
     } elseif ($locations.Count -eq 1) {
-        Write-Host "  ✓ '$file' only in $($locations[0])" -ForegroundColor Green
-    } else {
-        Write-Host "  ✗ '$file' found in multiple locations: $($locations -join ', ')" -ForegroundColor Red
-        $validationErrors += "$file found in multiple locations"
-        $problematicFilesOk = $false
-    }
+        Write-Host "  âœ“ '$file' only in $($locations[0])" -ForegroundColor Green
+}
+else {
+    Write-Host "  âœ— '$file' found in multiple locations: $($locations -join ', ')" -ForegroundColor Red
+    $validationErrors += "$file found in multiple locations"
+    $problematicFilesOk = $false
+}
 }
 
 Write-Host ""
-Write-Host "═══════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
 Write-Host "  Validation Summary" -ForegroundColor Cyan
-Write-Host "═══════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Statistics:" -ForegroundColor White
 Write-Host "  - Shared runtime files: $($sharedFiles.Count) components" -ForegroundColor Gray
@@ -233,27 +239,27 @@ Write-Host "  - Total components: $(($sharedFiles.Count) + ($publishedFiles.Coun
 Write-Host ""
 
 if ($validationErrors.Count -eq 0) {
-    Write-Host "✓ Validation PASSED" -ForegroundColor Green -BackgroundColor Black
+    Write-Host "âœ“ Validation PASSED" -ForegroundColor Green -BackgroundColor Black
     if ($validationWarnings.Count -gt 0) {
         Write-Host ""
         Write-Host "Warnings ($($validationWarnings.Count)):" -ForegroundColor Yellow
         foreach ($warning in $validationWarnings) {
-            Write-Host "  ⚠ $warning" -ForegroundColor Yellow
+            Write-Host "  âš  $warning" -ForegroundColor Yellow
         }
     }
     exit 0
 } else {
-    Write-Host "✗ Validation FAILED" -ForegroundColor Red -BackgroundColor Black
+    Write-Host "âœ— Validation FAILED" -ForegroundColor Red -BackgroundColor Black
     Write-Host ""
     Write-Host "Errors ($($validationErrors.Count)):" -ForegroundColor Red
-    foreach ($error in $validationErrors) {
-        Write-Host "  ✗ $error" -ForegroundColor Red
+    foreach ($validationError in $validationErrors) {
+        Write-Host "  X $validationError" -ForegroundColor Red
     }
     if ($validationWarnings.Count -gt 0) {
         Write-Host ""
         Write-Host "Warnings ($($validationWarnings.Count)):" -ForegroundColor Yellow
         foreach ($warning in $validationWarnings) {
-            Write-Host "  ⚠ $warning" -ForegroundColor Yellow
+            Write-Host "  ! $warning" -ForegroundColor Yellow
         }
     }
     exit 1

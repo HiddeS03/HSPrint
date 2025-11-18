@@ -87,22 +87,19 @@ function New-ComponentXml {
     
     $sourcePath = $sourcePath -replace '\\', '/'
     
-    return @"
-
-      <Component Id="$componentId" Guid="*">
-        <File Id="$fileId" Source="$sourcePath" />
-      </Component>
-"@
+    $xmlContent = "`n      <Component Id=`"$componentId`" Guid=`"*`">`n"
+    $xmlContent += "        <File Id=`"$fileId`" Source=`"$sourcePath`" />`n"
+    $xmlContent += "      </Component>"
+    
+    return $xmlContent
 }
 
 # Generate Shared Runtime Files (GeneratedSharedFiles.wxs)
 Write-Host "Generating shared runtime files..." -ForegroundColor Yellow
-$sharedXml = @"
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Fragment>
-    <ComponentGroup Id="SharedRuntimeFiles" Directory="INSTALLFOLDER">
-"@
+$sharedXml = '<?xml version="1.0" encoding="UTF-8"?>' + "`n"
+$sharedXml += '<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">' + "`n"
+$sharedXml += '  <Fragment>' + "`n"
+$sharedXml += '    <ComponentGroup Id="SharedRuntimeFiles" Directory="INSTALLFOLDER">'
 
 $componentIndex = 0
 foreach ($file in $sharedFiles | Sort-Object Name) {
@@ -115,25 +112,20 @@ foreach ($file in $sharedFiles | Sort-Object Name) {
     $sharedXml += New-ComponentXml -componentId $componentId -fileId $fileId -sourcePath $relativePath
 }
 
-$sharedXml += @"
-
-    </ComponentGroup>
-  </Fragment>
-</Wix>
-"@
+$sharedXml += "`n    </ComponentGroup>`n"
+$sharedXml += '  </Fragment>' + "`n"
+$sharedXml += '</Wix>'
 
 $sharedOutputFile = Join-Path $OutputDir "GeneratedSharedFiles.wxs"
-Set-Content -Path $sharedOutputFile -Value $sharedXml -Encoding UTF8
-Write-Host "  ✓ Created $sharedOutputFile with $componentIndex components" -ForegroundColor Green
+[System.IO.File]::WriteAllText($sharedOutputFile, $sharedXml, [System.Text.UTF8Encoding]::new($false))
+Write-Host "  Created $sharedOutputFile with $componentIndex components" -ForegroundColor Green
 
 # Generate HSPrint-specific files (GeneratedFiles.wxs)
 Write-Host "Generating HSPrint-specific files..." -ForegroundColor Yellow
-$publishXml = @"
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Fragment>
-    <ComponentGroup Id="PublishedFiles" Directory="INSTALLFOLDER">
-"@
+$publishXml = '<?xml version="1.0" encoding="UTF-8"?>' + "`n"
+$publishXml += '<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">' + "`n"
+$publishXml += '  <Fragment>' + "`n"
+$publishXml += '    <ComponentGroup Id="PublishedFiles" Directory="INSTALLFOLDER">'
 
 $componentIndex = 0
 foreach ($file in $publishOnlyFiles | Sort-Object Name) {
@@ -146,25 +138,20 @@ foreach ($file in $publishOnlyFiles | Sort-Object Name) {
     $publishXml += New-ComponentXml -componentId $componentId -fileId $fileId -sourcePath $relativePath
 }
 
-$publishXml += @"
-
-    </ComponentGroup>
-  </Fragment>
-</Wix>
-"@
+$publishXml += "`n    </ComponentGroup>`n"
+$publishXml += '  </Fragment>' + "`n"
+$publishXml += '</Wix>'
 
 $publishOutputFile = Join-Path $OutputDir "GeneratedFiles.wxs"
-Set-Content -Path $publishOutputFile -Value $publishXml -Encoding UTF8
-Write-Host "  ✓ Created $publishOutputFile with $componentIndex components" -ForegroundColor Green
+[System.IO.File]::WriteAllText($publishOutputFile, $publishXml, [System.Text.UTF8Encoding]::new($false))
+Write-Host "  Created $publishOutputFile with $componentIndex components" -ForegroundColor Green
 
 # Generate ConfigTool-specific files (GeneratedConfigToolFiles.wxs)
 Write-Host "Generating ConfigTool-specific files..." -ForegroundColor Yellow
-$configToolXml = @"
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Fragment>
-    <ComponentGroup Id="ConfigToolFiles" Directory="INSTALLFOLDER">
-"@
+$configToolXml = '<?xml version="1.0" encoding="UTF-8"?>' + "`n"
+$configToolXml += '<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">' + "`n"
+$configToolXml += '  <Fragment>' + "`n"
+$configToolXml += '    <ComponentGroup Id="ConfigToolFiles" Directory="INSTALLFOLDER">'
 
 $componentIndex = 0
 foreach ($file in $configToolOnlyFiles | Sort-Object Name) {
@@ -177,21 +164,16 @@ foreach ($file in $configToolOnlyFiles | Sort-Object Name) {
     $configToolXml += New-ComponentXml -componentId $componentId -fileId $fileId -sourcePath $relativePath
 }
 
-$configToolXml += @"
-
-    </ComponentGroup>
-  </Fragment>
-</Wix>
-"@
+$configToolXml += "`n    </ComponentGroup>`n"
+$configToolXml += '  </Fragment>' + "`n"
+$configToolXml += '</Wix>'
 
 $configToolOutputFile = Join-Path $OutputDir "GeneratedConfigToolFiles.wxs"
-Set-Content -Path $configToolOutputFile -Value $configToolXml -Encoding UTF8
-Write-Host "  ✓ Created $configToolOutputFile with $componentIndex components" -ForegroundColor Green
+[System.IO.File]::WriteAllText($configToolOutputFile, $configToolXml, [System.Text.UTF8Encoding]::new($false))
+Write-Host "  Created $configToolOutputFile with $componentIndex components" -ForegroundColor Green
 
 Write-Host ""
-Write-Host "═══════════════════════════════════════════════" -ForegroundColor Green
-Write-Host "✓ WiX file generation completed successfully!" -ForegroundColor Green
-Write-Host "═══════════════════════════════════════════════" -ForegroundColor Green
+Write-Host "WiX file generation completed successfully!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Summary:" -ForegroundColor Cyan
 Write-Host "  - Shared runtime files: $($sharedFiles.Count) components" -ForegroundColor White
