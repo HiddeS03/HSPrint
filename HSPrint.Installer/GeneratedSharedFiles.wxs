@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="SharedRuntimeFiles" Directory="INSTALLFOLDER">
+      <Component Id="Shared_clretwrc_dll" Guid="*">
+        <File Id="SharedFile_1" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/clretwrc.dll" />
+      </Component>
+      <Component Id="Shared_clrgc_dll" Guid="*">
+        <File Id="SharedFile_2" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/clrgc.dll" />
+      </Component>
+      <Component Id="Shared_clrjit_dll" Guid="*">
+        <File Id="SharedFile_3" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/clrjit.dll" />
+      </Component>
+      <Component Id="Shared_coreclr_dll" Guid="*">
+        <File Id="SharedFile_4" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/coreclr.dll" />
+      </Component>
+      <Component Id="Shared_createdump_exe" Guid="*">
+        <File Id="SharedFile_5" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/createdump.exe" />
+      </Component>
+      <Component Id="Shared_hostfxr_dll" Guid="*">
+        <File Id="SharedFile_6" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/hostfxr.dll" />
+      </Component>
+      <Component Id="Shared_hostpolicy_dll" Guid="*">
+        <File Id="SharedFile_7" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/hostpolicy.dll" />
+      </Component>
+      <Component Id="Shared_Microsoft_CSharp_dll" Guid="*">
+        <File Id="SharedFile_8" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/Microsoft.CSharp.dll" />
+      </Component>
+      <Component Id="Shared_Microsoft_DiaSymReader_Native_amd64_dll" Guid="*">
+        <File Id="SharedFile_9" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/Microsoft.DiaSymReader.Native.amd64.dll" />
+      </Component>
+      <Component Id="Shared_Microsoft_VisualBasic_Core_dll" Guid="*">
+        <File Id="SharedFile_10" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/Microsoft.VisualBasic.Core.dll" />
+      </Component>
+      <Component Id="Shared_Microsoft_VisualBasic_dll" Guid="*">
+        <File Id="SharedFile_11" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/Microsoft.VisualBasic.dll" />
+      </Component>
+      <Component Id="Shared_Microsoft_Win32_Primitives_dll" Guid="*">
+        <File Id="SharedFile_12" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/Microsoft.Win32.Primitives.dll" />
+      </Component>
+      <Component Id="Shared_Microsoft_Win32_Registry_dll" Guid="*">
+        <File Id="SharedFile_13" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/Microsoft.Win32.Registry.dll" />
+      </Component>
+      <Component Id="Shared_Microsoft_Win32_SystemEvents_dll" Guid="*">
+        <File Id="SharedFile_14" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/Microsoft.Win32.SystemEvents.dll" />
+      </Component>
+      <Component Id="Shared_Microsoft_Windows_SDK_NET_dll" Guid="*">
+        <File Id="SharedFile_15" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/Microsoft.Windows.SDK.NET.dll" />
+      </Component>
+      <Component Id="Shared_mscordaccore_dll" Guid="*">
+        <File Id="SharedFile_16" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/mscordaccore.dll" />
+      </Component>
+      <Component Id="Shared_mscordaccore_amd64_amd64_8_0_2125_47513_dll" Guid="*">
+        <File Id="SharedFile_17" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/mscordaccore_amd64_amd64_8.0.2125.47513.dll" />
+      </Component>
+      <Component Id="Shared_mscordbi_dll" Guid="*">
+        <File Id="SharedFile_18" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/mscordbi.dll" />
+      </Component>
+      <Component Id="Shared_mscorlib_dll" Guid="*">
+        <File Id="SharedFile_19" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/mscorlib.dll" />
+      </Component>
+      <Component Id="Shared_mscorrc_dll" Guid="*">
+        <File Id="SharedFile_20" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/mscorrc.dll" />
+      </Component>
+      <Component Id="Shared_msquic_dll" Guid="*">
+        <File Id="SharedFile_21" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/msquic.dll" />
+      </Component>
+      <Component Id="Shared_netstandard_dll" Guid="*">
+        <File Id="SharedFile_22" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/netstandard.dll" />
+      </Component>
+      <Component Id="Shared_System_AppContext_dll" Guid="*">
+        <File Id="SharedFile_23" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.AppContext.dll" />
+      </Component>
+      <Component Id="Shared_System_Buffers_dll" Guid="*">
+        <File Id="SharedFile_24" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Buffers.dll" />
+      </Component>
+      <Component Id="Shared_System_Collections_Concurrent_dll" Guid="*">
+        <File Id="SharedFile_25" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Collections.Concurrent.dll" />
+      </Component>
+      <Component Id="Shared_System_Collections_dll" Guid="*">
+        <File Id="SharedFile_26" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Collections.dll" />
+      </Component>
+      <Component Id="Shared_System_Collections_Immutable_dll" Guid="*">
+        <File Id="SharedFile_27" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Collections.Immutable.dll" />
+      </Component>
+      <Component Id="Shared_System_Collections_NonGeneric_dll" Guid="*">
+        <File Id="SharedFile_28" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Collections.NonGeneric.dll" />
+      </Component>
+      <Component Id="Shared_System_Collections_Specialized_dll" Guid="*">
+        <File Id="SharedFile_29" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Collections.Specialized.dll" />
+      </Component>
+      <Component Id="Shared_System_ComponentModel_Annotations_dll" Guid="*">
+        <File Id="SharedFile_30" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ComponentModel.Annotations.dll" />
+      </Component>
+      <Component Id="Shared_System_ComponentModel_DataAnnotations_dll" Guid="*">
+        <File Id="SharedFile_31" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ComponentModel.DataAnnotations.dll" />
+      </Component>
+      <Component Id="Shared_System_ComponentModel_dll" Guid="*">
+        <File Id="SharedFile_32" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ComponentModel.dll" />
+      </Component>
+      <Component Id="Shared_System_ComponentModel_EventBasedAsync_dll" Guid="*">
+        <File Id="SharedFile_33" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ComponentModel.EventBasedAsync.dll" />
+      </Component>
+      <Component Id="Shared_System_ComponentModel_Primitives_dll" Guid="*">
+        <File Id="SharedFile_34" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ComponentModel.Primitives.dll" />
+      </Component>
+      <Component Id="Shared_System_ComponentModel_TypeConverter_dll" Guid="*">
+        <File Id="SharedFile_35" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ComponentModel.TypeConverter.dll" />
+      </Component>
+      <Component Id="Shared_System_Configuration_dll" Guid="*">
+        <File Id="SharedFile_36" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Configuration.dll" />
+      </Component>
+      <Component Id="Shared_System_Console_dll" Guid="*">
+        <File Id="SharedFile_37" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Console.dll" />
+      </Component>
+      <Component Id="Shared_System_Core_dll" Guid="*">
+        <File Id="SharedFile_38" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Core.dll" />
+      </Component>
+      <Component Id="Shared_System_Data_Common_dll" Guid="*">
+        <File Id="SharedFile_39" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Data.Common.dll" />
+      </Component>
+      <Component Id="Shared_System_Data_DataSetExtensions_dll" Guid="*">
+        <File Id="SharedFile_40" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Data.DataSetExtensions.dll" />
+      </Component>
+      <Component Id="Shared_System_Data_dll" Guid="*">
+        <File Id="SharedFile_41" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Data.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_Contracts_dll" Guid="*">
+        <File Id="SharedFile_42" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.Contracts.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_Debug_dll" Guid="*">
+        <File Id="SharedFile_43" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.Debug.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_DiagnosticSource_dll" Guid="*">
+        <File Id="SharedFile_44" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.DiagnosticSource.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_EventLog_dll" Guid="*">
+        <File Id="SharedFile_45" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.EventLog.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_EventLog_Messages_dll" Guid="*">
+        <File Id="SharedFile_46" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.EventLog.Messages.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_FileVersionInfo_dll" Guid="*">
+        <File Id="SharedFile_47" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.FileVersionInfo.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_Process_dll" Guid="*">
+        <File Id="SharedFile_48" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.Process.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_StackTrace_dll" Guid="*">
+        <File Id="SharedFile_49" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.StackTrace.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_TextWriterTraceListener_dll" Guid="*">
+        <File Id="SharedFile_50" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.TextWriterTraceListener.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_Tools_dll" Guid="*">
+        <File Id="SharedFile_51" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.Tools.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_TraceSource_dll" Guid="*">
+        <File Id="SharedFile_52" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.TraceSource.dll" />
+      </Component>
+      <Component Id="Shared_System_Diagnostics_Tracing_dll" Guid="*">
+        <File Id="SharedFile_53" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Diagnostics.Tracing.dll" />
+      </Component>
+      <Component Id="Shared_System_dll" Guid="*">
+        <File Id="SharedFile_54" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.dll" />
+      </Component>
+      <Component Id="Shared_System_Drawing_Common_dll" Guid="*">
+        <File Id="SharedFile_55" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Drawing.Common.dll" />
+      </Component>
+      <Component Id="Shared_System_Drawing_dll" Guid="*">
+        <File Id="SharedFile_56" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Drawing.dll" />
+      </Component>
+      <Component Id="Shared_System_Drawing_Primitives_dll" Guid="*">
+        <File Id="SharedFile_57" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Drawing.Primitives.dll" />
+      </Component>
+      <Component Id="Shared_System_Dynamic_Runtime_dll" Guid="*">
+        <File Id="SharedFile_58" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Dynamic.Runtime.dll" />
+      </Component>
+      <Component Id="Shared_System_Formats_Asn1_dll" Guid="*">
+        <File Id="SharedFile_59" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Formats.Asn1.dll" />
+      </Component>
+      <Component Id="Shared_System_Formats_Tar_dll" Guid="*">
+        <File Id="SharedFile_60" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Formats.Tar.dll" />
+      </Component>
+      <Component Id="Shared_System_Globalization_Calendars_dll" Guid="*">
+        <File Id="SharedFile_61" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Globalization.Calendars.dll" />
+      </Component>
+      <Component Id="Shared_System_Globalization_dll" Guid="*">
+        <File Id="SharedFile_62" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Globalization.dll" />
+      </Component>
+      <Component Id="Shared_System_Globalization_Extensions_dll" Guid="*">
+        <File Id="SharedFile_63" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Globalization.Extensions.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_Compression_Brotli_dll" Guid="*">
+        <File Id="SharedFile_64" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.Compression.Brotli.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_Compression_dll" Guid="*">
+        <File Id="SharedFile_65" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.Compression.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_Compression_FileSystem_dll" Guid="*">
+        <File Id="SharedFile_66" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.Compression.FileSystem.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_Compression_Native_dll" Guid="*">
+        <File Id="SharedFile_67" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.Compression.Native.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_Compression_ZipFile_dll" Guid="*">
+        <File Id="SharedFile_68" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.Compression.ZipFile.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_dll" Guid="*">
+        <File Id="SharedFile_69" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_FileSystem_AccessControl_dll" Guid="*">
+        <File Id="SharedFile_70" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.FileSystem.AccessControl.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_FileSystem_dll" Guid="*">
+        <File Id="SharedFile_71" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.FileSystem.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_FileSystem_DriveInfo_dll" Guid="*">
+        <File Id="SharedFile_72" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.FileSystem.DriveInfo.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_FileSystem_Primitives_dll" Guid="*">
+        <File Id="SharedFile_73" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.FileSystem.Primitives.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_FileSystem_Watcher_dll" Guid="*">
+        <File Id="SharedFile_74" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.FileSystem.Watcher.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_IsolatedStorage_dll" Guid="*">
+        <File Id="SharedFile_75" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.IsolatedStorage.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_MemoryMappedFiles_dll" Guid="*">
+        <File Id="SharedFile_76" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.MemoryMappedFiles.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_Pipes_AccessControl_dll" Guid="*">
+        <File Id="SharedFile_77" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.Pipes.AccessControl.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_Pipes_dll" Guid="*">
+        <File Id="SharedFile_78" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.Pipes.dll" />
+      </Component>
+      <Component Id="Shared_System_IO_UnmanagedMemoryStream_dll" Guid="*">
+        <File Id="SharedFile_79" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.IO.UnmanagedMemoryStream.dll" />
+      </Component>
+      <Component Id="Shared_System_Linq_dll" Guid="*">
+        <File Id="SharedFile_80" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Linq.dll" />
+      </Component>
+      <Component Id="Shared_System_Linq_Expressions_dll" Guid="*">
+        <File Id="SharedFile_81" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Linq.Expressions.dll" />
+      </Component>
+      <Component Id="Shared_System_Linq_Parallel_dll" Guid="*">
+        <File Id="SharedFile_82" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Linq.Parallel.dll" />
+      </Component>
+      <Component Id="Shared_System_Linq_Queryable_dll" Guid="*">
+        <File Id="SharedFile_83" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Linq.Queryable.dll" />
+      </Component>
+      <Component Id="Shared_System_Memory_dll" Guid="*">
+        <File Id="SharedFile_84" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Memory.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_dll" Guid="*">
+        <File Id="SharedFile_85" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_Http_dll" Guid="*">
+        <File Id="SharedFile_86" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.Http.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_Http_Json_dll" Guid="*">
+        <File Id="SharedFile_87" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.Http.Json.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_HttpListener_dll" Guid="*">
+        <File Id="SharedFile_88" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.HttpListener.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_Mail_dll" Guid="*">
+        <File Id="SharedFile_89" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.Mail.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_NameResolution_dll" Guid="*">
+        <File Id="SharedFile_90" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.NameResolution.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_NetworkInformation_dll" Guid="*">
+        <File Id="SharedFile_91" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.NetworkInformation.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_Ping_dll" Guid="*">
+        <File Id="SharedFile_92" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.Ping.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_Primitives_dll" Guid="*">
+        <File Id="SharedFile_93" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.Primitives.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_Quic_dll" Guid="*">
+        <File Id="SharedFile_94" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.Quic.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_Requests_dll" Guid="*">
+        <File Id="SharedFile_95" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.Requests.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_Security_dll" Guid="*">
+        <File Id="SharedFile_96" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.Security.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_ServicePoint_dll" Guid="*">
+        <File Id="SharedFile_97" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.ServicePoint.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_Sockets_dll" Guid="*">
+        <File Id="SharedFile_98" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.Sockets.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_WebClient_dll" Guid="*">
+        <File Id="SharedFile_99" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.WebClient.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_WebHeaderCollection_dll" Guid="*">
+        <File Id="SharedFile_100" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.WebHeaderCollection.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_WebProxy_dll" Guid="*">
+        <File Id="SharedFile_101" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.WebProxy.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_WebSockets_Client_dll" Guid="*">
+        <File Id="SharedFile_102" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.WebSockets.Client.dll" />
+      </Component>
+      <Component Id="Shared_System_Net_WebSockets_dll" Guid="*">
+        <File Id="SharedFile_103" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Net.WebSockets.dll" />
+      </Component>
+      <Component Id="Shared_System_Numerics_dll" Guid="*">
+        <File Id="SharedFile_104" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Numerics.dll" />
+      </Component>
+      <Component Id="Shared_System_Numerics_Vectors_dll" Guid="*">
+        <File Id="SharedFile_105" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Numerics.Vectors.dll" />
+      </Component>
+      <Component Id="Shared_System_ObjectModel_dll" Guid="*">
+        <File Id="SharedFile_106" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ObjectModel.dll" />
+      </Component>
+      <Component Id="Shared_System_Private_CoreLib_dll" Guid="*">
+        <File Id="SharedFile_107" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Private.CoreLib.dll" />
+      </Component>
+      <Component Id="Shared_System_Private_DataContractSerialization_dll" Guid="*">
+        <File Id="SharedFile_108" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Private.DataContractSerialization.dll" />
+      </Component>
+      <Component Id="Shared_System_Private_Uri_dll" Guid="*">
+        <File Id="SharedFile_109" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Private.Uri.dll" />
+      </Component>
+      <Component Id="Shared_System_Private_Xml_dll" Guid="*">
+        <File Id="SharedFile_110" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Private.Xml.dll" />
+      </Component>
+      <Component Id="Shared_System_Private_Xml_Linq_dll" Guid="*">
+        <File Id="SharedFile_111" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Private.Xml.Linq.dll" />
+      </Component>
+      <Component Id="Shared_System_Reflection_DispatchProxy_dll" Guid="*">
+        <File Id="SharedFile_112" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Reflection.DispatchProxy.dll" />
+      </Component>
+      <Component Id="Shared_System_Reflection_dll" Guid="*">
+        <File Id="SharedFile_113" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Reflection.dll" />
+      </Component>
+      <Component Id="Shared_System_Reflection_Emit_dll" Guid="*">
+        <File Id="SharedFile_114" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Reflection.Emit.dll" />
+      </Component>
+      <Component Id="Shared_System_Reflection_Emit_ILGeneration_dll" Guid="*">
+        <File Id="SharedFile_115" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Reflection.Emit.ILGeneration.dll" />
+      </Component>
+      <Component Id="Shared_System_Reflection_Emit_Lightweight_dll" Guid="*">
+        <File Id="SharedFile_116" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Reflection.Emit.Lightweight.dll" />
+      </Component>
+      <Component Id="Shared_System_Reflection_Extensions_dll" Guid="*">
+        <File Id="SharedFile_117" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Reflection.Extensions.dll" />
+      </Component>
+      <Component Id="Shared_System_Reflection_Metadata_dll" Guid="*">
+        <File Id="SharedFile_118" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Reflection.Metadata.dll" />
+      </Component>
+      <Component Id="Shared_System_Reflection_Primitives_dll" Guid="*">
+        <File Id="SharedFile_119" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Reflection.Primitives.dll" />
+      </Component>
+      <Component Id="Shared_System_Reflection_TypeExtensions_dll" Guid="*">
+        <File Id="SharedFile_120" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Reflection.TypeExtensions.dll" />
+      </Component>
+      <Component Id="Shared_System_Resources_Reader_dll" Guid="*">
+        <File Id="SharedFile_121" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Resources.Reader.dll" />
+      </Component>
+      <Component Id="Shared_System_Resources_ResourceManager_dll" Guid="*">
+        <File Id="SharedFile_122" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Resources.ResourceManager.dll" />
+      </Component>
+      <Component Id="Shared_System_Resources_Writer_dll" Guid="*">
+        <File Id="SharedFile_123" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Resources.Writer.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_CompilerServices_Unsafe_dll" Guid="*">
+        <File Id="SharedFile_124" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.CompilerServices.Unsafe.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_CompilerServices_VisualC_dll" Guid="*">
+        <File Id="SharedFile_125" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.CompilerServices.VisualC.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_dll" Guid="*">
+        <File Id="SharedFile_126" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_Extensions_dll" Guid="*">
+        <File Id="SharedFile_127" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.Extensions.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_Handles_dll" Guid="*">
+        <File Id="SharedFile_128" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.Handles.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_InteropServices_dll" Guid="*">
+        <File Id="SharedFile_129" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.InteropServices.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_InteropServices_JavaScript_dll" Guid="*">
+        <File Id="SharedFile_130" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.InteropServices.JavaScript.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_InteropServices_RuntimeInformation_dll" Guid="*">
+        <File Id="SharedFile_131" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.InteropServices.RuntimeInformation.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_Intrinsics_dll" Guid="*">
+        <File Id="SharedFile_132" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.Intrinsics.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_Loader_dll" Guid="*">
+        <File Id="SharedFile_133" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.Loader.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_Numerics_dll" Guid="*">
+        <File Id="SharedFile_134" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.Numerics.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_Serialization_dll" Guid="*">
+        <File Id="SharedFile_135" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.Serialization.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_Serialization_Formatters_dll" Guid="*">
+        <File Id="SharedFile_136" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.Serialization.Formatters.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_Serialization_Json_dll" Guid="*">
+        <File Id="SharedFile_137" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.Serialization.Json.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_Serialization_Primitives_dll" Guid="*">
+        <File Id="SharedFile_138" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.Serialization.Primitives.dll" />
+      </Component>
+      <Component Id="Shared_System_Runtime_Serialization_Xml_dll" Guid="*">
+        <File Id="SharedFile_139" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Runtime.Serialization.Xml.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_AccessControl_dll" Guid="*">
+        <File Id="SharedFile_140" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.AccessControl.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Claims_dll" Guid="*">
+        <File Id="SharedFile_141" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Claims.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Cryptography_Algorithms_dll" Guid="*">
+        <File Id="SharedFile_142" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Cryptography.Algorithms.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Cryptography_Cng_dll" Guid="*">
+        <File Id="SharedFile_143" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Cryptography.Cng.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Cryptography_Csp_dll" Guid="*">
+        <File Id="SharedFile_144" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Cryptography.Csp.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Cryptography_dll" Guid="*">
+        <File Id="SharedFile_145" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Cryptography.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Cryptography_Encoding_dll" Guid="*">
+        <File Id="SharedFile_146" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Cryptography.Encoding.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Cryptography_OpenSsl_dll" Guid="*">
+        <File Id="SharedFile_147" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Cryptography.OpenSsl.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Cryptography_Pkcs_dll" Guid="*">
+        <File Id="SharedFile_148" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Cryptography.Pkcs.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Cryptography_Primitives_dll" Guid="*">
+        <File Id="SharedFile_149" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Cryptography.Primitives.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Cryptography_X509Certificates_dll" Guid="*">
+        <File Id="SharedFile_150" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Cryptography.X509Certificates.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Cryptography_Xml_dll" Guid="*">
+        <File Id="SharedFile_151" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Cryptography.Xml.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_dll" Guid="*">
+        <File Id="SharedFile_152" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Principal_dll" Guid="*">
+        <File Id="SharedFile_153" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Principal.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_Principal_Windows_dll" Guid="*">
+        <File Id="SharedFile_154" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.Principal.Windows.dll" />
+      </Component>
+      <Component Id="Shared_System_Security_SecureString_dll" Guid="*">
+        <File Id="SharedFile_155" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Security.SecureString.dll" />
+      </Component>
+      <Component Id="Shared_System_ServiceModel_Web_dll" Guid="*">
+        <File Id="SharedFile_156" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ServiceModel.Web.dll" />
+      </Component>
+      <Component Id="Shared_System_ServiceProcess_dll" Guid="*">
+        <File Id="SharedFile_157" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ServiceProcess.dll" />
+      </Component>
+      <Component Id="Shared_System_ServiceProcess_ServiceController_dll" Guid="*">
+        <File Id="SharedFile_158" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ServiceProcess.ServiceController.dll" />
+      </Component>
+      <Component Id="Shared_System_Text_Encoding_CodePages_dll" Guid="*">
+        <File Id="SharedFile_159" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Text.Encoding.CodePages.dll" />
+      </Component>
+      <Component Id="Shared_System_Text_Encoding_dll" Guid="*">
+        <File Id="SharedFile_160" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Text.Encoding.dll" />
+      </Component>
+      <Component Id="Shared_System_Text_Encoding_Extensions_dll" Guid="*">
+        <File Id="SharedFile_161" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Text.Encoding.Extensions.dll" />
+      </Component>
+      <Component Id="Shared_System_Text_Encodings_Web_dll" Guid="*">
+        <File Id="SharedFile_162" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Text.Encodings.Web.dll" />
+      </Component>
+      <Component Id="Shared_System_Text_Json_dll" Guid="*">
+        <File Id="SharedFile_163" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Text.Json.dll" />
+      </Component>
+      <Component Id="Shared_System_Text_RegularExpressions_dll" Guid="*">
+        <File Id="SharedFile_164" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Text.RegularExpressions.dll" />
+      </Component>
+      <Component Id="Shared_System_Threading_Channels_dll" Guid="*">
+        <File Id="SharedFile_165" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Threading.Channels.dll" />
+      </Component>
+      <Component Id="Shared_System_Threading_dll" Guid="*">
+        <File Id="SharedFile_166" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Threading.dll" />
+      </Component>
+      <Component Id="Shared_System_Threading_Overlapped_dll" Guid="*">
+        <File Id="SharedFile_167" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Threading.Overlapped.dll" />
+      </Component>
+      <Component Id="Shared_System_Threading_Tasks_Dataflow_dll" Guid="*">
+        <File Id="SharedFile_168" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Threading.Tasks.Dataflow.dll" />
+      </Component>
+      <Component Id="Shared_System_Threading_Tasks_dll" Guid="*">
+        <File Id="SharedFile_169" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Threading.Tasks.dll" />
+      </Component>
+      <Component Id="Shared_System_Threading_Tasks_Extensions_dll" Guid="*">
+        <File Id="SharedFile_170" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Threading.Tasks.Extensions.dll" />
+      </Component>
+      <Component Id="Shared_System_Threading_Tasks_Parallel_dll" Guid="*">
+        <File Id="SharedFile_171" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Threading.Tasks.Parallel.dll" />
+      </Component>
+      <Component Id="Shared_System_Threading_Thread_dll" Guid="*">
+        <File Id="SharedFile_172" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Threading.Thread.dll" />
+      </Component>
+      <Component Id="Shared_System_Threading_ThreadPool_dll" Guid="*">
+        <File Id="SharedFile_173" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Threading.ThreadPool.dll" />
+      </Component>
+      <Component Id="Shared_System_Threading_Timer_dll" Guid="*">
+        <File Id="SharedFile_174" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Threading.Timer.dll" />
+      </Component>
+      <Component Id="Shared_System_Transactions_dll" Guid="*">
+        <File Id="SharedFile_175" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Transactions.dll" />
+      </Component>
+      <Component Id="Shared_System_Transactions_Local_dll" Guid="*">
+        <File Id="SharedFile_176" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Transactions.Local.dll" />
+      </Component>
+      <Component Id="Shared_System_ValueTuple_dll" Guid="*">
+        <File Id="SharedFile_177" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.ValueTuple.dll" />
+      </Component>
+      <Component Id="Shared_System_Web_dll" Guid="*">
+        <File Id="SharedFile_178" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Web.dll" />
+      </Component>
+      <Component Id="Shared_System_Web_HttpUtility_dll" Guid="*">
+        <File Id="SharedFile_179" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Web.HttpUtility.dll" />
+      </Component>
+      <Component Id="Shared_System_Windows_dll" Guid="*">
+        <File Id="SharedFile_180" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Windows.dll" />
+      </Component>
+      <Component Id="Shared_System_Xml_dll" Guid="*">
+        <File Id="SharedFile_181" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Xml.dll" />
+      </Component>
+      <Component Id="Shared_System_Xml_Linq_dll" Guid="*">
+        <File Id="SharedFile_182" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Xml.Linq.dll" />
+      </Component>
+      <Component Id="Shared_System_Xml_ReaderWriter_dll" Guid="*">
+        <File Id="SharedFile_183" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Xml.ReaderWriter.dll" />
+      </Component>
+      <Component Id="Shared_System_Xml_Serialization_dll" Guid="*">
+        <File Id="SharedFile_184" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Xml.Serialization.dll" />
+      </Component>
+      <Component Id="Shared_System_Xml_XDocument_dll" Guid="*">
+        <File Id="SharedFile_185" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Xml.XDocument.dll" />
+      </Component>
+      <Component Id="Shared_System_Xml_XmlDocument_dll" Guid="*">
+        <File Id="SharedFile_186" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Xml.XmlDocument.dll" />
+      </Component>
+      <Component Id="Shared_System_Xml_XmlSerializer_dll" Guid="*">
+        <File Id="SharedFile_187" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Xml.XmlSerializer.dll" />
+      </Component>
+      <Component Id="Shared_System_Xml_XPath_dll" Guid="*">
+        <File Id="SharedFile_188" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Xml.XPath.dll" />
+      </Component>
+      <Component Id="Shared_System_Xml_XPath_XDocument_dll" Guid="*">
+        <File Id="SharedFile_189" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/System.Xml.XPath.XDocument.dll" />
+      </Component>
+      <Component Id="Shared_WindowsBase_dll" Guid="*">
+        <File Id="SharedFile_190" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/WindowsBase.dll" />
+      </Component>
+      <Component Id="Shared_WinRT_Runtime_dll" Guid="*">
+        <File Id="SharedFile_191" Source="../bin/Release/net8.0-windows10.0.26100.0/win-x64/publish/WinRT.Runtime.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

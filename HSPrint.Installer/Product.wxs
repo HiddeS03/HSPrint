@@ -25,6 +25,10 @@
 
     <MediaTemplate EmbedCab="yes" />
 
+    <!-- Product Icon -->
+    <Icon Id="ProductIcon" SourceFile="..\assets\logo.ico" />
+    <Property Id="ARPPRODUCTICON" Value="ProductIcon" />
+
     <!-- Launch condition: Windows 10 or later -->
   <Launch Condition="VersionNT &gt;= 603" 
      Message="This application requires Windows 10 or later." />
@@ -49,6 +53,10 @@
           <!-- Core application files -->
     <File Id="HSPrintDll" 
         Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.dll" />
+          <File Id="HSPrintDeps" 
+        Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.deps.json" />
+          <File Id="HSPrintRuntimeConfig" 
+        Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.runtimeconfig.json" />
 
         <!-- Registry key to detect installation -->
   <RegistryKey Root="HKLM" Key="Software\HSPrint">
@@ -64,7 +72,8 @@
        Description="Local printer agent for HS Software - Handles ZPL, Image, and PDF printing"
            Start="auto"
       Account="LocalSystem"
-               ErrorControl="normal">
+               ErrorControl="normal"
+               Vital="yes">
  <util:ServiceConfig
   FirstFailureActionType="restart"
      SecondFailureActionType="restart"
@@ -87,6 +96,10 @@
                 KeyPath="yes" />
           <File Id="ConfigToolDll" 
                 Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.dll" />
+          <File Id="ConfigToolDeps" 
+                Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.deps.json" />
+          <File Id="ConfigToolRuntimeConfig" 
+                Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.runtimeconfig.json" />
         </Component>
 
         <!-- Configuration Tool startup -->
@@ -112,10 +125,12 @@
       <Directory Id="ProgramMenuDir" Name="HSPrint">
    <Component Id="StartMenuShortcuts" Guid="D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A">
           <Shortcut Id="StartMenuShortcut"
-  Name="HSPrint Configuration"
+  Name="HSPrint"
         Description="HSPrint Configuration Tool"
       Target="[#ConfigToolExe]"
-          WorkingDirectory="INSTALLFOLDER" />
+          WorkingDirectory="INSTALLFOLDER"
+          Icon="ProductIcon"
+          IconIndex="0" />
           <RemoveFolder Id="RemoveProgramMenuDir" On="uninstall" />
        <RegistryValue Root="HKCU" Key="Software\HSPrint\Shortcuts" Type="integer" Value="1" KeyPath="yes" />
         </Component>

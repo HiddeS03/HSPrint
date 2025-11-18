@@ -1,12 +1,26 @@
-﻿using Serilog;
-using HSPrint.Services;
+﻿using HSPrint.Services;
 using HSPrint.Utils;
+using Serilog;
 
-// Configure Serilog
+// Configure Serilog with proper log directory
+var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+var logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "HSPrint", "logs");
+
+// Ensure log directory exists
+Directory.CreateDirectory(logDir);
+
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(baseDir)
+    .AddJsonFile("appsettings.json")
+    .Build();
+
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(new ConfigurationBuilder()
-     .AddJsonFile("appsettings.json")
-        .Build())
+    .ReadFrom.Configuration(configuration)
+    .WriteTo.File(
+        path: Path.Combine(logDir, "hsprinteragent-.log"),
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
     .CreateLogger();
 
 try
@@ -28,9 +42,10 @@ try
     string version = "1.0.0";
     try
     {
-        if (File.Exists("version.txt"))
+        var versionPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "version.txt");
+        if (File.Exists(versionPath))
         {
-            version = (await File.ReadAllTextAsync("version.txt")).Trim();
+            version = (await File.ReadAllTextAsync(versionPath)).Trim();
         }
     }
     catch (Exception ex)
@@ -146,17 +161,18 @@ static async Task CheckInstallationAsync()
         {
             var installedVersion = InstallHelper.GetInstalledVersion();
             var currentVersion = "1.0.0";
-            
+
             try
             {
-                if (File.Exists("version.txt"))
+                var versionPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "version.txt");
+                if (File.Exists(versionPath))
                 {
-                    currentVersion = (await File.ReadAllTextAsync("version.txt")).Trim();
+                    currentVersion = (await File.ReadAllTextAsync(versionPath)).Trim();
                 }
             }
             catch { }
 
-            Log.Information("Installed version: {InstalledVersion}, Current version: {CurrentVersion}", 
+            Log.Information("Installed version: {InstalledVersion}, Current version: {CurrentVersion}",
               installedVersion, currentVersion);
 
             // If versions differ, we might be in an upgrade scenario

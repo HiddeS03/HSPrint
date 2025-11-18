@@ -52,7 +52,7 @@ partial class ConfigForm
         this.lblTitle.Name = "lblTitle";
         this.lblTitle.Size = new Size(300, 30);
         this.lblTitle.TabIndex = 0;
-        this.lblTitle.Text = "HSPrint Configuration";
+        this.lblTitle.Text = "HSPrint";
 
         // grpServiceControl
         this.grpServiceControl.Controls.Add(this.lblServiceStatusLabel);
