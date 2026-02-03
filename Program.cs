@@ -1,4 +1,4 @@
-﻿using HSPrint.Services;
+using HSPrint.Services;
 using HSPrint.Utils;
 using Serilog;
 
@@ -54,10 +54,25 @@ try
     }
     builder.Configuration["Version"] = version;
 
-    // Configure Kestrel to listen only on localhost
+    // Read port from configuration
+    var port = builder.Configuration.GetValue<int>("Port", 5246);
+    var enableNetworkMode = builder.Configuration.GetValue<bool>("Network:EnableNetworkMode", false);
+
+    // Configure Kestrel to listen on localhost or all interfaces based on network mode
     builder.WebHost.ConfigureKestrel(options =>
        {
-           options.ListenLocalhost(50246);
+           if (enableNetworkMode)
+           {
+               // Listen on all network interfaces for network mode
+               options.ListenAnyIP(port);
+               Log.Information("Network mode enabled - Listening on all interfaces at port {Port}", port);
+           }
+           else
+           {
+               // Listen only on localhost for local-only mode
+               options.ListenLocalhost(port);
+               Log.Information("Local-only mode - Listening on localhost at port {Port}", port);
+           }
        });
 
     // Add services to the container
@@ -83,14 +98,27 @@ try
     {
         options.AddPolicy("AllowFrontend", policy =>
         {
-            var allowedOrigins = new[] { "http://localhost:3001", "https://hssoftware.nl" };
-            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+            if (enableNetworkMode)
+            {
+                // Allow all origins in network mode for inter-PC communication
+                policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+            }
+            else
+            {
+                // Restrict to specific origins in local-only mode
+                var allowedOrigins = new[] { "http://localhost:3001", "https://hssoftware.nl" };
+                policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+            }
         });
     });
 
     // Register application services
     builder.Services.AddScoped<IPrinterService, PrinterService>();
     builder.Services.AddScoped<IPrintService, PrintService>();
+    builder.Services.AddScoped<INetworkService, NetworkService>();
+    
+    // Add HttpClientFactory for network communication
+    builder.Services.AddHttpClient();
 
     // Register Updater
     builder.Services.AddSingleton(sp =>
@@ -129,7 +157,7 @@ try
         documentation = "/swagger"
     });
 
-    Log.Information("HSPrint v{Version} starting on http://localhost:50246", version);
+    Log.Information("HSPrint v{Version} starting on http://localhost:{Port}", version, port);
 
     app.Run();
 }
