@@ -1,143 +1,77 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util"
-     xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
-  
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util" xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
   <?define ProductName = "HSPrint" ?>
   <?define Manufacturer = "HS Software" ?>
   <?define UpgradeCode = "A8B9C0D1-E2F3-4A5B-6C7D-8E9F0A1B2C3D" ?>
-  
-  <Package Name="$(var.ProductName)" 
- Manufacturer="$(var.Manufacturer)" 
-    Version="!(bind.fileVersion.HSPrintExe)"
-           UpgradeCode="$(var.UpgradeCode)"
-   Language="1033"
-       Compressed="yes"
- InstallerVersion="500">
-    
-    <SummaryInformation Keywords="Installer" 
-      Description="HSPrint Printer Agent Installer" 
-         Manufacturer="$(var.Manufacturer)" />
-
+  <Package Name="$(var.ProductName)" Manufacturer="$(var.Manufacturer)" Version="!(bind.fileVersion.HSPrintExe)" UpgradeCode="$(var.UpgradeCode)" Language="1033" Compressed="yes" InstallerVersion="500">
+    <SummaryInformation Keywords="Installer" Description="HSPrint Printer Agent Installer" Manufacturer="$(var.Manufacturer)" />
     <!-- Major upgrade: Uninstall previous versions -->
-    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed."
-            AllowSameVersionUpgrades="yes"
-    Schedule="afterInstallInitialize" />
-
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" Schedule="afterInstallInitialize" />
     <MediaTemplate EmbedCab="yes" />
-
     <!-- Product Icon -->
     <Icon Id="ProductIcon" SourceFile="..\assets\logo.ico" />
     <Property Id="ARPPRODUCTICON" Value="ProductIcon" />
-
     <!-- Launch condition: Windows 10 or later -->
-  <Launch Condition="VersionNT &gt;= 603" 
-     Message="This application requires Windows 10 or later." />
-
+    <Launch Condition="VersionNT &gt;= 603" Message="This application requires Windows 10 or later." />
     <!-- Install to Program Files -->
-  <StandardDirectory Id="ProgramFilesFolder">
+    <StandardDirectory Id="ProgramFilesFolder">
       <Directory Id="INSTALLFOLDER" Name="HSPrint">
-        
-    <!-- Main service component -->
+        <!-- Main service component -->
         <Component Id="HSPrintMainFiles" Guid="B9C0D1E2-F3A4-5B6C-7D8E-9F0A1B2C3D4E">
           <!-- Main executable - use relative path from publish directory -->
-          <File Id="HSPrintExe" 
-        Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.exe" 
-                KeyPath="yes" />
-    
+          <File Id="HSPrintExe" Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.exe" KeyPath="yes" />
           <!-- Configuration files -->
-    <File Id="AppSettingsJson" 
-            Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\appsettings.json" />
-          <File Id="VersionTxt" 
-          Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\version.txt" />
-
+          <File Id="AppSettingsJson" Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\appsettings.json" />
+          <File Id="VersionTxt" Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\version.txt" />
           <!-- Core application files -->
-    <File Id="HSPrintDll" 
-        Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.dll" />
-          <File Id="HSPrintDeps" 
-        Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.deps.json" />
-          <File Id="HSPrintRuntimeConfig" 
-        Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.runtimeconfig.json" />
-
-        <!-- Registry key to detect installation -->
-  <RegistryKey Root="HKLM" Key="Software\HSPrint">
- <RegistryValue Type="string" Name="InstallPath" Value="[INSTALLFOLDER]" />
-         <RegistryValue Type="string" Name="Version" Value="!(bind.fileVersion.HSPrintExe)" />
-       </RegistryKey>
-
- <!-- Service installation -->
-          <ServiceInstall Id="HSPrintService"
-   Type="ownProcess"
-     Name="HSPrintService"
-      DisplayName="HSPrint Printer Agent"
-       Description="Local printer agent for HS Software - Handles ZPL, Image, and PDF printing"
-           Start="auto"
-      Account="LocalSystem"
-               ErrorControl="normal"
-               Vital="yes">
- <util:ServiceConfig
-  FirstFailureActionType="restart"
-     SecondFailureActionType="restart"
-          ThirdFailureActionType="restart"
-       RestartServiceDelayInSeconds="60" />
+          <File Id="HSPrintDll" Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.dll" />
+          <File Id="HSPrintDeps" Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.deps.json" />
+          <File Id="HSPrintRuntimeConfig" Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\publish\HSPrint.runtimeconfig.json" />
+          <!-- Registry key to detect installation -->
+          <RegistryKey Root="HKLM" Key="Software\HSPrint">
+            <RegistryValue Type="string" Name="InstallPath" Value="[INSTALLFOLDER]" />
+            <RegistryValue Type="string" Name="Version" Value="!(bind.fileVersion.HSPrintExe)" />
+          </RegistryKey>
+          <!-- Service installation -->
+          <ServiceInstall Id="HSPrintService" Type="ownProcess" Name="HSPrintService" DisplayName="HSPrint Printer Agent" Description="Local printer agent for HS Software - Handles ZPL, Image, and PDF printing" Start="auto" Account="LocalSystem" ErrorControl="normal" Vital="yes">
+            <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" RestartServiceDelayInSeconds="60" />
           </ServiceInstall>
-
-     <ServiceControl Id="HSPrintServiceControl"
- Name="HSPrintService"
-          Start="install"
-      Stop="both"
-    Remove="uninstall"
-         Wait="yes" />
+          <ServiceControl Id="HSPrintServiceControl" Name="HSPrintService" Start="install" Stop="both" Remove="uninstall" Wait="yes" />
+          <fw:FirewallException Id="HSPrintFirewallRule" Name="HSPrint Service Port 5246" Description="Allow inbound TCP connections on port 5246 for HSPrint network printing" Port="5246" Protocol="tcp" Scope="any" IgnoreFailure="yes" />
         </Component>
-
         <!-- Configuration Tool component -->
         <Component Id="HSPrintConfigTool" Guid="D2E3F4A5-B6C7-8D9E-0F1A-2B3C4D5E6F7A">
-          <File Id="ConfigToolExe" 
-                Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.exe" 
-                KeyPath="yes" />
-          <File Id="ConfigToolDll" 
-                Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.dll" />
-          <File Id="ConfigToolDeps" 
-                Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.deps.json" />
-          <File Id="ConfigToolRuntimeConfig" 
-                Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.runtimeconfig.json" />
+          <File Id="ConfigToolExe" Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.exe" KeyPath="yes" />
+          <File Id="ConfigToolDll" Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.dll" />
+          <File Id="ConfigToolDeps" Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.deps.json" />
+          <File Id="ConfigToolRuntimeConfig" Source="..\bin\Release\net8.0-windows10.0.26100.0\win-x64\configtool\HSPrint.ConfigTool.runtimeconfig.json" />
         </Component>
-
         <!-- Configuration Tool startup -->
         <Component Id="ConfigToolStartup" Guid="E3F4A5B6-C7D8-9E0F-1A2B-3C4D5E6F7A8B">
           <RegistryKey Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Run">
             <RegistryValue Type="string" Name="HSPrintConfig" Value="&quot;[#ConfigToolExe]&quot;" KeyPath="yes" />
           </RegistryKey>
         </Component>
-
-      <!-- Logs subdirectory -->
- <Directory Id="LogsFolder" Name="logs">
-     <Component Id="LogsFolder" Guid="C0D1E2F3-A4B5-6C7D-8E9F-0A1B2C3D4E5F">
+        <!-- Logs subdirectory -->
+        <Directory Id="LogsFolder" Name="logs">
+          <Component Id="LogsFolder" Guid="C0D1E2F3-A4B5-6C7D-8E9F-0A1B2C3D4E5F">
             <CreateFolder />
-     <RemoveFolder Id="RemoveLogsFolder" On="uninstall" />
-   <RegistryValue Root="HKCU" Key="Software\HSPrint\Folders" Name="Logs" Type="string" Value="" KeyPath="yes" />
+            <RemoveFolder Id="RemoveLogsFolder" On="uninstall" />
+            <RegistryValue Root="HKCU" Key="Software\HSPrint\Folders" Name="Logs" Type="string" Value="" KeyPath="yes" />
           </Component>
- </Directory>
+        </Directory>
       </Directory>
     </StandardDirectory>
-
     <!-- Startup shortcut in Start Menu for Config Tool -->
     <StandardDirectory Id="ProgramMenuFolder">
       <Directory Id="ProgramMenuDir" Name="HSPrint">
-   <Component Id="StartMenuShortcuts" Guid="D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A">
-          <Shortcut Id="StartMenuShortcut"
-  Name="HSPrint"
-        Description="HSPrint Configuration Tool"
-      Target="[#ConfigToolExe]"
-          WorkingDirectory="INSTALLFOLDER"
-          Icon="ProductIcon"
-          IconIndex="0" />
+        <Component Id="StartMenuShortcuts" Guid="D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A">
+          <Shortcut Id="StartMenuShortcut" Name="HSPrint" Description="HSPrint Configuration Tool" Target="[#ConfigToolExe]" WorkingDirectory="INSTALLFOLDER" Icon="ProductIcon" IconIndex="0" />
           <RemoveFolder Id="RemoveProgramMenuDir" On="uninstall" />
-       <RegistryValue Root="HKCU" Key="Software\HSPrint\Shortcuts" Type="integer" Value="1" KeyPath="yes" />
+          <RegistryValue Root="HKCU" Key="Software\HSPrint\Shortcuts" Type="integer" Value="1" KeyPath="yes" />
         </Component>
       </Directory>
     </StandardDirectory>
-
     <!-- Feature: Complete installation -->
     <Feature Id="ProductFeature" Title="HSPrint" Level="1">
       <ComponentRef Id="HSPrintMainFiles" />

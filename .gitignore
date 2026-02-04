@@ -65,3 +65,6 @@ Thumbs.db
 *.tmp
 *.temp
 *.cache
+
+# WiX Installer generated files
+HSPrint.Installer/Generated*.wxs
