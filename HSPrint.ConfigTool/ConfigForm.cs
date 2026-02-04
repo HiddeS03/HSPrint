@@ -56,6 +56,14 @@ public partial class ConfigForm : Form
         UpdateServiceStatus();
         UpdateStartupStatus();
         LoadLogs();
+
+        // Start minimized to tray
+        this.WindowState = FormWindowState.Minimized;
+        this.ShowInTaskbar = false;
+        this.Hide();
+
+        // Automatically start the service if it's not running
+        AutoStartService();
     }
 
     private ContextMenuStrip CreateContextMenu()
@@ -69,10 +77,30 @@ public partial class ConfigForm : Form
 
     private void ShowForm()
     {
+        this.ShowInTaskbar = true;
         Show();
         WindowState = FormWindowState.Normal;
         PositionWindowBottomRight();
         Activate();
+    }
+
+    private void AutoStartService()
+    {
+        try
+        {
+            var service = GetService();
+            if (service != null && service.Status != ServiceControllerStatus.Running)
+            {
+                service.Start();
+                service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
+                UpdateServiceStatus();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't show message box since we're starting minimized
+            System.Diagnostics.Debug.WriteLine($"Error auto-starting service: {ex.Message}");
+        }
     }
 
     private void ApplyTitleBarColor()
@@ -106,6 +134,7 @@ public partial class ConfigForm : Form
         if (e.CloseReason == CloseReason.UserClosing)
         {
             e.Cancel = true;
+            this.ShowInTaskbar = false;
             Hide();
         }
         base.OnFormClosing(e);
@@ -190,9 +219,17 @@ public partial class ConfigForm : Form
                     allLines.Add(line);
                 }
 
-                txtLogs.Text = string.Join(Environment.NewLine, allLines.TakeLast(500));
-                txtLogs.SelectionStart = txtLogs.Text.Length;
-                txtLogs.ScrollToCaret();
+                var newText = string.Join(Environment.NewLine, allLines.TakeLast(500));
+                
+                // Only update if text has changed to avoid flickering
+                if (txtLogs.Text != newText)
+                {
+                    txtLogs.Text = newText;
+                    // Auto-scroll to bottom to show latest logs
+                    txtLogs.SelectionStart = txtLogs.Text.Length;
+                    txtLogs.SelectionLength = 0;
+                    txtLogs.ScrollToCaret();
+                }
             }
             else
             {
