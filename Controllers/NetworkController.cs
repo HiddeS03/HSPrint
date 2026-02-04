@@ -150,13 +150,40 @@ public class NetworkController : ControllerBase
         try
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
+            
+            // Prioritize private network IP addresses (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
             foreach (var ip in host.AddressList)
             {
                 if (ip.AddressFamily == AddressFamily.InterNetwork)
                 {
+                    var ipString = ip.ToString();
+                    var bytes = ip.GetAddressBytes();
+                    
+                    // Check for private network ranges
+                    if (bytes[0] == 192 && bytes[1] == 168) // 192.168.x.x
+                    {
+                        return ipString;
+                    }
+                    if (bytes[0] == 10) // 10.x.x.x
+                    {
+                        return ipString;
+                    }
+                    if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31) // 172.16-31.x.x
+                    {
+                        return ipString;
+                    }
+                }
+            }
+            
+            // If no private IP found, return any IPv4 address that's not loopback
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip))
+                {
                     return ip.ToString();
                 }
             }
+            
             return "127.0.0.1";
         }
         catch (Exception ex)
