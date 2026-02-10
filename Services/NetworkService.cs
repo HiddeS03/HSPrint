@@ -42,7 +42,7 @@ public class NetworkService : INetworkService
             };
 
             var json = JsonSerializer.Serialize(requestBody);
-            var content = new StringContent(json, Encoding.UTF8, System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json"));
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var url = $"http://{targetIp}:{targetPort}/{endpoint}";
             _logger.LogInformation("Sending request to: {Url}", url);
