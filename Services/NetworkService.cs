@@ -41,7 +41,12 @@ public class NetworkService : INetworkService
                 _ => throw new ArgumentException($"Unsupported print type: {printType}")
             };
 
-            var json = JsonSerializer.Serialize(requestBody);
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = null // Use exact property names, no camelCase conversion
+            };
+
+            var json = JsonSerializer.Serialize(requestBody, jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var url = $"http://{targetIp}:{targetPort}/{endpoint}";
