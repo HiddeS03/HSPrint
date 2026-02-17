@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Net.Sockets;
 using System.Text;
+using HSPrint.Models;
 using HSPrint.Utils;
 
 namespace HSPrint.Services;
@@ -15,29 +16,27 @@ public class PrintService : IPrintService
         _logger = logger;
     }
 
-    public async Task<bool> PrintZpl(string printerName, string zpl)
+    public async Task<(bool success, string? errorMessage)> PrintZpl(string printerName, string zpl)
     {
         try
         {
-            _logger.LogInformation("Printing ZPL to printer: {PrinterName}", printerName);
+            var availablePrinters = GetAvailablePrinters();
+            string normalizedPrinterName = NormalizePrinterName(printerName, availablePrinters);
 
-            bool success = RawPrinterHelper.SendStringToPrinter(printerName, zpl);
+            bool success = RawPrinterHelper.SendStringToPrinter(normalizedPrinterName, zpl, out string? errorMessage);
 
-            if (success)
+            if (!success)
             {
-                _logger.LogInformation("Successfully printed ZPL to {PrinterName}", printerName);
-            }
-            else
-            {
-                _logger.LogWarning("Failed to print ZPL to {PrinterName}", printerName);
+                _logger.LogWarning("Failed to print ZPL to '{RequestedName}' (normalized to '{ActualName}'). Error: {ErrorMessage}. Available printers: {Printers}", 
+                    printerName, normalizedPrinterName, errorMessage, string.Join(", ", availablePrinters.Select(p => $"'{p.Name}'")));
             }
 
-            return await Task.FromResult(success);
+            return await Task.FromResult((success, errorMessage));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error printing ZPL to {PrinterName}", printerName);
-            return false;
+            return (false, $"Exception: {ex.Message}");
         }
     }
 
@@ -201,8 +200,6 @@ public class PrintService : IPrintService
 
                     System.Diagnostics.Process.Start(processInfo);
                     await Task.Delay(3000);
-
-                    _logger.LogWarning("Attempted to print PDF using Windows shell to {PrinterName}", printerName);
                 }
             }
 
@@ -235,5 +232,73 @@ public class PrintService : IPrintService
                     });
             }
         }
+    }
+
+    public List<PrinterInfo> GetAvailablePrinters()
+    {
+        try
+        {
+            _logger.LogInformation("Getting list of available printers");
+
+            var printers = new List<PrinterInfo>();
+            var defaultPrinter = new PrintDocument().PrinterSettings.PrinterName;
+
+            foreach (string printerName in PrinterSettings.InstalledPrinters)
+            {
+                bool isDefault = printerName.Equals(defaultPrinter, StringComparison.OrdinalIgnoreCase);
+                bool isNetworkPrinter = printerName.StartsWith(@"\\") || printerName.Contains("-");
+
+                printers.Add(new PrinterInfo(printerName, isDefault, isNetworkPrinter));
+            }
+
+            _logger.LogInformation("Found {Count} printers", printers.Count);
+            return printers;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting printer list");
+            return new List<PrinterInfo>();
+        }
+    }
+
+    private string NormalizePrinterName(string printerName, List<PrinterInfo> availablePrinters)
+    {
+        // If the printer name matches exactly, use it as-is
+        if (availablePrinters.Any(p => p.Name.Equals(printerName, StringComparison.OrdinalIgnoreCase)))
+        {
+            return printerName;
+        }
+
+        // Try to match by removing hostname prefix (e.g., "Laptop-Hidde - Generic / Text Only" -> "Generic / Text Only")
+        var hostname = System.Net.Dns.GetHostName();
+        var prefixes = new[] 
+        { 
+            $"{hostname} - ",           // "Laptop-Hidde - "
+            $"{hostname}- ",            // "Laptop-Hidde- "
+            $"{hostname} -",            // "Laptop-Hidde -"
+            $@"\\{hostname}\",          // "\\Laptop-Hidde\"
+            $"{hostname.ToUpper()} - ", // "LAPTOP-HIDDE - "
+            $"{hostname.ToLower()} - "  // "laptop-hidde - "
+        };
+
+        foreach (var prefix in prefixes)
+        {
+            if (printerName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                string strippedName = printerName.Substring(prefix.Length);
+
+                // Check if this matches an available printer
+                var match = availablePrinters.FirstOrDefault(p => 
+                    p.Name.Equals(strippedName, StringComparison.OrdinalIgnoreCase));
+
+                if (match != null)
+                {
+                    return match.Name;
+                }
+            }
+        }
+
+        // If no match found, return original name
+        return printerName;
     }
 }

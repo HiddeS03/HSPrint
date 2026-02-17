@@ -11,5 +11,6 @@ public record NetworkInfo(
 
 public record PrinterInfo(
     string Name,
-    bool IsDefault
+    bool IsDefault,
+    bool IsNetworkPrinter = false
 );

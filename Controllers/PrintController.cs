@@ -31,14 +31,14 @@ public class PrintController : ControllerBase
             return BadRequest(new { error = "PrinterName and Zpl are required" });
         }
 
-        var success = await _printService.PrintZpl(request.PrinterName, request.Zpl);
+        var (success, errorMessage) = await _printService.PrintZpl(request.PrinterName, request.Zpl);
 
         if (success)
         {
             return Ok(new { message = "Print job sent successfully", printer = request.PrinterName });
         }
 
-        return BadRequest(new { error = "Failed to send print job" });
+        return BadRequest(new { error = "Failed to send print job", details = errorMessage });
     }
 
     /// <summary>
@@ -74,8 +74,6 @@ public class PrintController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> PrintImage([FromBody] ImagePrintRequest request)
     {
-        _logger.LogInformation("POST /print/image - Printer: {Printer}", request.PrinterName);
-
         if (string.IsNullOrWhiteSpace(request.PrinterName) || string.IsNullOrWhiteSpace(request.Base64Png))
         {
             return BadRequest(new { error = "PrinterName and Base64Png are required" });

@@ -41,11 +41,12 @@ public class RawPrinterHelper
     /// <summary>
     /// Sends bytes to a printer
     /// </summary>
-    public static bool SendBytesToPrinter(string printerName, IntPtr pBytes, int dwCount)
+    public static bool SendBytesToPrinter(string printerName, IntPtr pBytes, int dwCount, out string? errorMessage)
     {
         IntPtr hPrinter = IntPtr.Zero;
         DOCINFOA di = new DOCINFOA();
         bool success = false;
+        errorMessage = null;
 
         di.pDocName = "HSPrint Document";
         di.pDataType = "RAW";
@@ -64,16 +65,33 @@ public class RawPrinterHelper
                         // Write bytes to the printer
                         int written;
                         success = WritePrinter(hPrinter, pBytes, dwCount, out written);
+                        if (!success)
+                        {
+                            errorMessage = $"WritePrinter failed. Win32 Error: {Marshal.GetLastWin32Error()}";
+                        }
                         EndPagePrinter(hPrinter);
+                    }
+                    else
+                    {
+                        errorMessage = $"StartPagePrinter failed. Win32 Error: {Marshal.GetLastWin32Error()}";
                     }
                     EndDocPrinter(hPrinter);
                 }
+                else
+                {
+                    errorMessage = $"StartDocPrinter failed. Win32 Error: {Marshal.GetLastWin32Error()}. The printer '{printerName}' may not support RAW data type.";
+                }
                 ClosePrinter(hPrinter);
             }
+            else
+            {
+                errorMessage = $"OpenPrinter failed for '{printerName}'. Win32 Error: {Marshal.GetLastWin32Error()}. Check if the printer exists.";
+            }
         }
-        catch
+        catch (Exception ex)
         {
             success = false;
+            errorMessage = $"Exception: {ex.Message}";
         }
 
         return success;
@@ -82,10 +100,11 @@ public class RawPrinterHelper
     /// <summary>
     /// Sends a string to a printer
     /// </summary>
-    public static bool SendStringToPrinter(string printerName, string data)
+    public static bool SendStringToPrinter(string printerName, string data, out string? errorMessage)
     {
         IntPtr pBytes = IntPtr.Zero;
         bool success = false;
+        errorMessage = null;
 
         try
         {
@@ -98,7 +117,7 @@ public class RawPrinterHelper
             Marshal.Copy(bytes, 0, pBytes, count);
 
             // Send to printer
-            success = SendBytesToPrinter(printerName, pBytes, count);
+            success = SendBytesToPrinter(printerName, pBytes, count, out errorMessage);
         }
         finally
         {
