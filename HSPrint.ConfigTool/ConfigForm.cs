@@ -56,6 +56,7 @@ public partial class ConfigForm : Form
         UpdateServiceStatus();
         UpdateStartupStatus();
         LoadLogs();
+        SetupCloudPairing();
 
         // Start minimized to tray
         this.WindowState = FormWindowState.Minimized;

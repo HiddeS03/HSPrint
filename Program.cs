@@ -120,6 +120,10 @@ try
     // Add HttpClientFactory for network communication
     builder.Services.AddHttpClient();
 
+    // Printen via internet: one instance that both polls and serves /cloud.
+    builder.Services.AddSingleton<CloudPrintService>();
+    builder.Services.AddHostedService(sp => sp.GetRequiredService<CloudPrintService>());
+
     // Register Updater
     builder.Services.AddSingleton(sp =>
     {
