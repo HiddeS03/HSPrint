@@ -22,8 +22,8 @@ $Src = Join-Path $Root 'src'
 $Out = Join-Path $Root 'labels'
 $Branch = 'cloud-print'
 $PrinterName = 'Zebra Testprinter (HSPrint)'
-$PortName = 'HSPrintTest_9101'
-$ListenPort = 9101
+$PortName = 'HSPrintTest_9109'
+$ListenPort = 9109
 $ServiceName = 'HSPrintService'
 $PreviewUrl = 'https://hs-software-git-label-genie-editor-v2-hidde-steginks-projects.vercel.app/apps/label-genie'
 
@@ -87,7 +87,9 @@ if (-not (Get-PrinterDriver -Name 'Generic / Text Only' -ErrorAction SilentlyCon
 if (-not (Get-PrinterPort -Name $PortName -ErrorAction SilentlyContinue)) {
   Add-PrinterPort -Name $PortName -PrinterHostAddress '127.0.0.1' -PortNumber $ListenPort
 }
-if (-not (Get-Printer -Name $PrinterName -ErrorAction SilentlyContinue)) {
+$existing = Get-Printer -Name $PrinterName -ErrorAction SilentlyContinue
+if ($existing -and $existing.PortName -ne $PortName) { Set-Printer -Name $PrinterName -PortName $PortName }
+if (-not $existing) {
   Add-Printer -Name $PrinterName -DriverName 'Generic / Text Only' -PortName $PortName
 }
 Ok "Labels komen in $Out"
